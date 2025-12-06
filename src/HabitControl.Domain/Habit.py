@@ -1,13 +1,20 @@
 from .Base import Base
+from sqlalchemy import Column, Integer, String
+import enum
+
+class HabitStatus(enum.Enum):
+    start = (0, "start")#Пользователь начал вырабатывать привычку
+    end = (1, "end")#Привычка выработана
+    frozen = (2, "frozen")#Пользователь временно перестал пытаться вырабатывать привычку
+    delete = (3, "delete")#Удалить привычку
+
+
 
 class Habit(Base):
-    def __init__(self, id, tittle, is_done = False):
-        self.tittle = tittle
-        self.__id = id
-        self.is_done = is_done
+    tittle = Column(String)
 
-    @property
-    def id(self, id):
-        return self.__id
+    id = Column(Integer, primary_key=True, index = True)
+    
+    status = Column(String)
 
     
