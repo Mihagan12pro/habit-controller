@@ -1,25 +1,15 @@
-from .Base import Base
-from .Habit import Habit
 from __future__ import annotations
 from typing import List
-from sqlalchemy import ForeignKey
-from sqlalchemy import Integer
-from sqlalchemy.orm import Mapped
-from sqlalchemy.orm import mapped_column
-from sqlalchemy.orm import DeclarativeBase
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from src.database import Base # Импортируем Base из database.py
 
 class User(Base):
     __tablename__ = "users_table"
-    
-    name : Mapped[str] = mapped_column(nullable=False)
 
     id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(nullable=False)
+    hashed_password: Mapped[str] = mapped_column(nullable=False)
+    email: Mapped[str] = mapped_column(nullable=False, unique=True)
 
-    hashed_password : Mapped[str] = mapped_column(nullable=False)
-
-    email :  Mapped[str] = mapped_column(nullable=False)
-
-    habits : Mapped[List["Habit"]] = relationship( back_populates= "user")
-
-
+    # Используем строку "Habit", чтобы не импортировать файл Habit.py и не ломать код
+    habits: Mapped[List["Habit"]] = relationship(back_populates="user")

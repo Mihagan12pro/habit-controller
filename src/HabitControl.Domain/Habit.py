@@ -1,37 +1,20 @@
-from .Base import Base
-from .User import User
-from .Progress import Progress
 from __future__ import annotations
 from typing import List
 from sqlalchemy import ForeignKey
-from sqlalchemy import Integer
-from sqlalchemy.orm import Mapped
-from sqlalchemy.orm import mapped_column
-from sqlalchemy.orm import DeclarativeBase
-from sqlalchemy.orm import relationship
-
-def start_habit():
-    return "start"
-def end_habit():
-    return "end"
-def frozen_habit():
-    return "frozen"
-def delete_habit():
-    return "delete"
-
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from src.database import Base
 
 class Habit(Base):
     __tablename__ = "habits_table"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    title: Mapped[str] = mapped_column(nullable=False) # Исправил tittle на title
+    status: Mapped[str] = mapped_column(default="start")
     
-    tittle : Mapped[str] = mapped_column(nullable=False)
-
-    id : Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users_table.id"))
     
-    status = mapped_column(nullable=False, default=start_habit())
-
-    user_id : Mapped[int] = mapped_column(ForeignKey("users_table.id"))
-    user : Mapped["User"] = relationship(back_populates="habits")
-
-    progress : Mapped["Progress"] = relationship()
-
+    # Связи строками, чтобы избежать ошибок
+    user: Mapped["User"] = relationship(back_populates="habits")
     
+    # Важно: Прогресса много, поэтому List
+    progress: Mapped[List["Progress"]] = relationship(back_populates="habit")
