@@ -1,7 +1,8 @@
 import database as data_access
-from repositories import habits_repository as habits_rep
-from repositories import progress_repository as progress_rep
-from repositories import users_repository as users_rep
+from repositories import habits as habits_rep
+# from repositories import progress_repository as progress_rep
+from repositories import progress as progress_rep
+from repositories import users as users_rep
 
 """
 Файл внедрения зависимостей
@@ -9,6 +10,12 @@ from repositories import users_repository as users_rep
 
 database = data_access.get_db()  # Объект базы данных
 
-users_repository = users_rep.UsersRepository(database=database)
-habits_repository = habits_rep.HabitsRepository(database=database)
-progress_repository = progress_rep.ProgressRepository(database=database)
+async def get_users_repository(session: data_access.Session = data_access.get_db) -> users_rep.UsersRepository: 
+    return users_rep.UsersRepository(session)
+
+async def get_habits_repository(session: data_access.Session = data_access.get_db) ->  habits_rep.HabitsRepository: 
+    return habits_rep.HabitsRepository(session)
+
+async def get_progress_repository(session: data_access.Session = data_access.get_db) -> progress_rep.ProgressRepository: 
+    return progress_rep.ProgressRepository(session)
+
