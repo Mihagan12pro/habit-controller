@@ -38,9 +38,9 @@ class ProgressCreate(BaseModel):
     date: str  # YYYY-MM-DD
 
 
-class StatsOut(BaseModel):
-    habit_id: int
-    habit_title: str
-    total_completions: int
-    current_streak: int  # Добавим расчет серии!
-    dates: List[str]
+# class StatsOut(BaseModel):
+#     habit_id: int
+#     habit_title: str
+#     total_completions: int
+#     current_streak: int  # Добавим расчет серии!
+#     dates: List[str] 

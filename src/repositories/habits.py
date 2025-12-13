@@ -59,9 +59,11 @@ class HabitsRepository(RepositoryBase):  # Репозиторий для при�
 
          await self.session.commit()
 
-         if status != habit.start:
-             progress = await self.progress_repository.get_by_habit_async(habit).first()
-             await self.progress_repository.delete_async(progress)
+         progress = await self.progress_repository.get_by_habit_async(habit).first()#По любому при изменении статуса привычки статистика сбросится
+         await self.progress_repository.delete_async(progress)
+
+         if status == habit.start:#Но статус "start", то создастся новая статистика, т.к. человек, к примеру, хотел бросить курить, но сорвался и покурил, тем самым начал как-бы заново
+            await self.progress_repository.add_async(habit)
 
     """
     Получить привычку по ее названию
