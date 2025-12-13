@@ -111,8 +111,6 @@ class HabitsRepository(RepositoryBase):  # Репозиторий для при�
          await self.session.delete(habit)
          await self.session.commit()
 
-         return id
-
          
 
 
