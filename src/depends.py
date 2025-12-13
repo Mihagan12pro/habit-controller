@@ -10,7 +10,3 @@ database =  data_access.get_db()#Объект базы данных
 users_repository = users_rep.UsersRepository(database = database)
 habits_repository = habits_rep.HabitsRepository(database = database)
 progress_repository = progress_rep.ProgressRepository(database = database)
-
-
-
-
