@@ -3,7 +3,6 @@ from models import user as u
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
-
 class UsersRepository(RepositoryBase):  # Репозиторий для юзеров
     def __init__(self, session):
         super().__init__(session)
@@ -14,7 +13,7 @@ class UsersRepository(RepositoryBase):  # Репозиторий для юзер
     async def add_async(self, user):
         errors = []#Массив ошибок
         user.Email = user.Email.lower()
-        result = await self.session.execute(select(u.User).filter_by(Email=user.Email))
+        result = await self.session.execute(select(u.User).filter_by(email=user.email))
         existing_user = result.scalar_one_or_none()
 
         if existing_user is not None:
