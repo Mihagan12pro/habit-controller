@@ -1,7 +1,11 @@
 from __future__ import annotations
+
 from typing import List
+
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from models.Base import Base # Импортируем Base из database.py
+
+from models.Base import Base  # Импортируем Base из database.py
+
 
 class User(Base):
     __tablename__ = "users_table"
