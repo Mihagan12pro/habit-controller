@@ -1,3 +1,3 @@
 class RepositoryBase:  # Базовый класс для всех репозиториев
-    def __init__(self, database):
-        self._database = database  # Даем ссылку репозиторию на объект класса бд
+    def __init__(self, session):
+        self._database = session  # Даем ссылку репозиторию на объект класса бд

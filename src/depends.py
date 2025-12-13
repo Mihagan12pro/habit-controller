@@ -8,14 +8,14 @@ from repositories import users as users_rep
 Файл внедрения зависимостей
 """
 
-database = data_access.get_db()  # Объект базы данных
+database = data_access.get_db_session()  # Объект базы данных
 
-async def get_users_repository(session: data_access.Session = data_access.get_db) -> users_rep.UsersRepository: 
+async def get_users_repository(session: data_access.Session = data_access.get_db_session) -> users_rep.UsersRepository: 
     return users_rep.UsersRepository(session)
 
-async def get_habits_repository(session: data_access.Session = data_access.get_db) ->  habits_rep.HabitsRepository: 
+async def get_habits_repository(session: data_access.Session = data_access.get_db_session) ->  habits_rep.HabitsRepository: 
     return habits_rep.HabitsRepository(session)
 
-async def get_progress_repository(session: data_access.Session = data_access.get_db) -> progress_rep.ProgressRepository: 
+async def get_progress_repository(session: data_access.Session = data_access.get_db_session) -> progress_rep.ProgressRepository: 
     return progress_rep.ProgressRepository(session)
 

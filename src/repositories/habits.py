@@ -2,8 +2,8 @@ from repositories.base import RepositoryBase
 
 
 class HabitsRepository(RepositoryBase):  # Репозиторий для привычек
-    def __init__(self, database):
-        super().__init__(database)
+    def __init__(self, session):
+        super().__init__(session)
 
     async def add_async(habit):
         pass

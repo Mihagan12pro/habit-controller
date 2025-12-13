@@ -2,8 +2,8 @@ from repositories.base import RepositoryBase
 
 
 class ProgressRepository(RepositoryBase):  # Репозиторий для прогресса по привычке
-    def __init__(self, database):
-        super().__init__(database)
+    def __init__(self, session):
+        super().__init__(session)
 
     async def add_async(progress):
         pass
