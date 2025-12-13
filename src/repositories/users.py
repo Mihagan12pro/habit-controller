@@ -33,6 +33,8 @@ class UsersRepository(RepositoryBase):  # Репозиторий для юзер
             errors.append("Пользователь с таким именем не найден!")
             return errors
         
+        return user.hashed_password
+        
         
         
 
