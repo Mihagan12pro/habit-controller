@@ -1,4 +1,4 @@
-from base_repository import RepositoryBase
+from repositories.base import RepositoryBase
 
 
 class ProgressRepository(RepositoryBase):  # Репозиторий для прогресса по привычке

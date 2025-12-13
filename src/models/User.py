@@ -4,7 +4,7 @@ from typing import List
 
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from models.Base import Base  # Импортируем Base из database.py
+from models.base import Base  # Импортируем Base из database.py
 
 
 class User(Base):
@@ -17,4 +17,3 @@ class User(Base):
 
     # Используем строку "Habit", чтобы не импортировать файл habit.py и не ломать код
     habits: Mapped[List["Habit"]] = relationship(back_populates="user")
-

@@ -5,7 +5,7 @@ from typing import List
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from models.Base import Base
+from models.base import Base
 
 
 class Habit(Base):
@@ -22,4 +22,3 @@ class Habit(Base):
 
     # Важно: Прогресса много, поэтому List
     progress: Mapped[List["Progress"]] = relationship(back_populates="habit")
-

@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from src import schemas
 from src.models.habit import Habit
-from src.models.Progress import Progress
+from src.models.progress import Progress
 
 
 def create_new_habit(db: Session, user_id: int, habit_dto: schemas.HabitCreate):

@@ -1,4 +1,4 @@
-from base_repository import RepositoryBase
+from repositories.base import RepositoryBase
 
 
 class HabitsRepository(RepositoryBase):  # Репозиторий для привычек

@@ -1,4 +1,4 @@
-from repositories.base_repository import RepositoryBase
+from repositories.base import RepositoryBase
 
 
 class UsersRepository(RepositoryBase):  # Репозиторий для юзеров
