@@ -12,9 +12,9 @@ class HabitsRepository(RepositoryBase):  # Репозиторий для при�
     """
     Добавление асинхронно
     """
-    async def add_async(self, user_id, title):
+    async def add_async(self, user, title):
         errors = []#Массив ошибок
-        check_user_existing = await self.session.execute(select(u.User).filter_by(u.User.id == user_id))
+        check_user_existing = await self.session.execute(select(u.User).filter_by(u.User.id == user.id))
 
         if check_user_existing == None:
             errors.append("Пользователя не существует!")
@@ -35,7 +35,7 @@ class HabitsRepository(RepositoryBase):  # Репозиторий для при�
         habit = h.Habit()
         habit.status = habit.started
         habit.title = title
-        habit.user_id = user_id
+        habit.user_id = user.id
         
         self.session.add(habit)
 
