@@ -1,7 +1,11 @@
 from __future__ import annotations
+
 from typing import List
+
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from models.Base import Base # Импортируем Base из database.py
+
+from models.base import Base  # Импортируем Base из database.py
+
 
 class User(Base):
     __tablename__ = "users_table"
@@ -11,5 +15,5 @@ class User(Base):
     hashed_password: Mapped[str] = mapped_column(nullable=False)
     email: Mapped[str] = mapped_column(nullable=False, unique=True)
 
-    # Используем строку "Habit", чтобы не импортировать файл Habit.py и не ломать код
+    # Используем строку "Habit", чтобы не импортировать файл habit.py и не ломать код
     habits: Mapped[List["Habit"]] = relationship(back_populates="user")

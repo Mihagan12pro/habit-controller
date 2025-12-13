@@ -1,9 +1,10 @@
-from base_repository import RepositoryBase
+from repositories.base import RepositoryBase
 
-class ProgressRepository(RepositoryBase):#Репозиторий для прогресса по привычке
+
+class ProgressRepository(RepositoryBase):  # Репозиторий для прогресса по привычке
     def __init__(self, database):
         super().__init__(database)
-    
+
     async def add_async(progress):
         pass
 
