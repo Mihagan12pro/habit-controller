@@ -1,12 +1,13 @@
 from repositories.base import RepositoryBase
 from models import user as u, habit as h
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy import and_
 
 class HabitsRepository(RepositoryBase):  # Репозиторий для привычек
     def __init__(self, session):
         super().__init__(session)
+    
+    progress_repository = None#Обязательно надо инициализировать поле
 
     """
     Добавление асинхронно
@@ -40,16 +41,7 @@ class HabitsRepository(RepositoryBase):  # Репозиторий для при�
 
         await self.session.commit()
 
-        result = await self.session.execute(select(u.User.id).filter_by(
-                and_(
-                    h.Habit.title == habit.title,
-                    h.Habit.user_id == habit.user_id
-                )
-            ))
-        
-        return result.first().id
-
-
+        await self.session.progress_repository.add_async(self, habit)#Привычка создается - создаается статистика
 
     """
     Обновление статуса привычки
@@ -62,9 +54,14 @@ class HabitsRepository(RepositoryBase):  # Репозиторий для при�
             errors.append("Такой привычки не существует!")
             return errors
          
-         result.first().status = status
+         habit = result.first()
+         habit.status = status
 
          await self.session.commit()
+
+         if status != habit.start:
+             progress = await self.progress_repository.get_by_habit_async(habit.id).first()
+             await self.progress_repository.delete_async(progress)
 
     """
     Получить привычку по ее названию
@@ -98,16 +95,21 @@ class HabitsRepository(RepositoryBase):  # Репозиторий для при�
     """
     Удалить привычку
     """
-    async def delete_habit(self, id):
+    async def delete_habit(self, habit):
          errors = []#Массив ошибок
 
-         habit = await self.session.execute(select(h.Habit).filter_by(h.Habit.id == id))
+         result = await self.session.execute(select(h.Habit).filter_by(h.Habit.id == habit.id))
 
-         if habit.first() == None:
+         if result.first() == None:
              errors.append("Данной привычки не существует!")
 
              return errors
-        
+         
+         id = habit.id
+
+         progress = await self.progress_repository.get_by_habit_async(id).first()
+         await self.progress_repository.delete_async(progress)#Сперва удалим прогресс, т.к. в нем содержится внешний ключ на привычку
+
          await self.session.delete(habit)
          await self.session.commit()
 

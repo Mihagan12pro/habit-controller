@@ -14,7 +14,12 @@ async def get_users_repository(session: data_access.Session = data_access.get_db
     return users_rep.UsersRepository(session)
 
 async def get_habits_repository(session: data_access.Session = data_access.get_db) ->  habits_rep.HabitsRepository: 
-    return habits_rep.HabitsRepository(session)
+    progress_repository = await progress_rep.ProgressRepository(session)
+    
+    habits_repository = habits_rep.HabitsRepository(session)
+    habits_repository.progress_repository = progress_repository
+
+    return habits_repository
 
 async def get_progress_repository(session: data_access.Session = data_access.get_db) -> progress_rep.ProgressRepository: 
     return progress_rep.ProgressRepository(session)
