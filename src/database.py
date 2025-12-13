@@ -3,7 +3,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import sessionmaker
 
-SQLALCHEMY_DATABASE_URL = "sqlite:///./flawless.db"
+SQLALCHEMY_DATABASE_URL = "sqlite:///./habitsController.db"
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
@@ -19,4 +19,6 @@ def get_db():
     try:
         yield db
     finally:
-        db.close()
+        db.close()#Не лучше ли перенести это в папку "models"? 
+
+Base.metadata.create_all(bind=engine)
