@@ -2,7 +2,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from src import schemas
-from src.models.User import User
+from src.models.user import User
 
 
 def create_user(db: Session, user_dto: schemas.UserCreate):

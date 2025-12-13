@@ -2,7 +2,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from src import schemas
-from src.models.Habit import Habit
+from src.models.habit import Habit
 from src.models.Progress import Progress
 
 

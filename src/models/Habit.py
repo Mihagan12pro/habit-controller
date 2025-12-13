@@ -22,3 +22,4 @@ class Habit(Base):
 
     # Важно: Прогресса много, поэтому List
     progress: Mapped[List["Progress"]] = relationship(back_populates="habit")
+
