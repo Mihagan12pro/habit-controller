@@ -7,7 +7,9 @@ class HabitsRepository(RepositoryBase):  # Репозиторий для при�
     def __init__(self, session):
         super().__init__(session)
 
-    #Добавление асинхронно
+    """
+    Добавление асинхронно
+    """
     async def add_async(self, habit):
         errors = []#Массив ошибок
         id = habit.user_id
@@ -21,7 +23,9 @@ class HabitsRepository(RepositoryBase):  # Репозиторий для при�
 
         await self.session.commit()
 
-    #Обновление статуса привычки
+    """
+    Обновление статуса привычки
+    """
     async def update_status_async(self, id, status):
          errors = []#Массив ошибок
          result = await self.session.execute(select(h.Habit).filter_by(h.Habit.id == id))
@@ -34,7 +38,9 @@ class HabitsRepository(RepositoryBase):  # Репозиторий для при�
 
          await self.session.commit()
 
-    #Получить привычку по ее названию
+    """
+    Получить привычку по ее названию
+    """
     async def get_by_name_async(self, name):
         errors = []#Массив ошибок
         result = await self.session.execute(select(h.Habit).filter_by(h.Habit.name == name))

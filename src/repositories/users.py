@@ -24,12 +24,15 @@ class UsersRepository(RepositoryBase):  # Репозиторий для юзер
 
         await self.session.commit()
 
+    """
+    Получение пароля пользователя по логину
+    """
     async def get_password(self, name):
         errors = []
         user = self.session.get(u.User, user.name)
 
         if user == None:
-            errors.append("Пользователь с таким именем не найден!")
+            errors.append("Неверный логин или пароль!")
             return errors
         
         return user.hashed_password
