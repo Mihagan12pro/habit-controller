@@ -11,7 +11,7 @@ engine = create_engine(
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 # Создаем базовый класс в современном стиле 2.0
-class Base(DeclarativeBase):
+class Base(DeclarativeBase):#Не лучше ли перенести это в папку "models"? 
     pass
 
 def get_db():
@@ -19,6 +19,6 @@ def get_db():
     try:
         yield db
     finally:
-        db.close()#Не лучше ли перенести это в папку "models"? 
+        db.close()
 
 Base.metadata.create_all(bind=engine)
