@@ -1,7 +1,7 @@
 from __future__ import annotations
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from src.database import Base
+from models.Base import Base
 
 class Progress(Base):
     __tablename__ = "progress_table"
