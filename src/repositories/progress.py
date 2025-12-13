@@ -5,11 +5,11 @@ class ProgressRepository(RepositoryBase):  # Репозиторий для пр�
     def __init__(self, session):
         super().__init__(session)
 
-    async def add_async(progress):
+    async def add_async(self, progress):
         pass
 
-    async def get_by_habit_async(habit):
+    async def get_by_habit_async(self, habit):
         pass
 
-    async def update_async(habit):
+    async def update_async(self, habit):
         pass
