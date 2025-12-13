@@ -27,10 +27,10 @@ class ProgressRepository(RepositoryBase):  # Репозиторий для пр�
     """
     Получить прогресс по привычке
     """
-    async def get_by_habit_async(self, habit_id):
+    async def get_by_habit_async(self, habit):
         errors = []#Массив ошибок
 
-        progress = await self.session.execute(select(h.Habit).filter_by(h.Habit.id == habit_id)).first()
+        progress = await self.session.execute(select(h.Habit).filter_by(h.Habit.id == habit.id)).first()
 
         if progress == None:
             errors.append("Привычка не найдена!")
@@ -39,4 +39,5 @@ class ProgressRepository(RepositoryBase):  # Репозиторий для пр�
         return progress
 
     async def delete_async(self, progress):
-        pass
+        await self.session.delete(progress)
+        await self.session.commit()

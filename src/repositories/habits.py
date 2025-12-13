@@ -60,7 +60,7 @@ class HabitsRepository(RepositoryBase):  # Репозиторий для при�
          await self.session.commit()
 
          if status != habit.start:
-             progress = await self.progress_repository.get_by_habit_async(habit.id).first()
+             progress = await self.progress_repository.get_by_habit_async(habit).first()
              await self.progress_repository.delete_async(progress)
 
     """
@@ -105,9 +105,7 @@ class HabitsRepository(RepositoryBase):  # Репозиторий для при�
 
              return errors
          
-         id = habit.id
-
-         progress = await self.progress_repository.get_by_habit_async(id).first()
+         progress = await self.progress_repository.get_by_habit_async(habit).first()
          await self.progress_repository.delete_async(progress)#Сперва удалим прогресс, т.к. в нем содержится внешний ключ на привычку
 
          await self.session.delete(habit)
