@@ -1,9 +1,10 @@
-from base_repository import RepositoryBase
+from repositories.base import RepositoryBase
 
-class HabitsRepository(RepositoryBase):#Репозиторий для привычек
+
+class HabitsRepository(RepositoryBase):  # Репозиторий для привычек
     def __init__(self, database):
         super().__init__(database)
-    
+
     async def add_async(habit):
         pass
 
