@@ -50,6 +50,23 @@ class HabitsRepository(RepositoryBase):  # Репозиторий для при�
             return errors
         
         return result
+    
+    """
+    Получить все привычки
+    """
+    async def get_habits(self):
+        result = await self.session.execute(select(h.Habit))
+
+        return result
+    
+    """
+    Получить все привычки с определенным статусом
+    """
+    async def get_habits_by_status(self, status):
+         result = await self.session.execute(select(h.Habit).filter_by(h.Habit.status == status))
+
+         return result
+
 
 
         
