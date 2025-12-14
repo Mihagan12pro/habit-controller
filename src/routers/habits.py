@@ -5,8 +5,8 @@ from sqlalchemy.orm import Session
 
 from src import schemas
 from src.database import get_db
-from src.services.habit import create_new_habit, get_user_stats, track_progress
-from src.services.user import get_user_by_id  # Для проверки юзера
+from src.services.habit_service import create_new_habit, get_user_stats, track_progress
+from src.services.user_service import get_user_by_id  # Для проверки юзера
 
 router = APIRouter(prefix="/habits", tags=["Habits"])
 
