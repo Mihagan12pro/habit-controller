@@ -15,7 +15,6 @@ class HabitsRepository(RepositoryBase):  # Репозиторий для при�
     """
     Добавление асинхронно
     """
-
     async def add_async(self, user, title):
         errors = []  # Массив ошибок
         check_user_existing = (
@@ -55,7 +54,6 @@ class HabitsRepository(RepositoryBase):  # Репозиторий для при�
     """
     Обновление статуса привычки
     """
-
     async def update_status_async(self, id, status):
         errors = []  # Массив ошибок
         result = await self.session.execute(select(h.Habit).where(h.Habit.id == id))
@@ -84,15 +82,16 @@ class HabitsRepository(RepositoryBase):  # Репозиторий для при�
             await self.progress_repository.add_async(habit)
 
     """
-    Получить привычку по ее названию
+    Получить привычку по ее названию и id пользователя
     """
-
-    async def get_by_name_async(self, name):
+    async def get_by_name_async(self, title, user_id):
         errors = []  # Массив ошибок
         result = await self.session.execute(
-            select(h.Habit).where(h.Habit.title == name)
+            select(h.Habit).where(and_(
+                h.Habit.title == title,
+                h.Habit.user_id == user_id
+            ))
         )
-
         if result is None:
             errors.append("Такой привычки не существует!")
             return errors
@@ -100,30 +99,35 @@ class HabitsRepository(RepositoryBase):  # Репозиторий для при�
         return result
 
     """
-    Получить все привычки
+    Получить все привычки пользователя
     """
-
-    async def get_habits(self):
-        result = await self.session.execute(select(h.Habit))
+    async def get_habits_async(self, user):
+        result = await self.session.execute(select(h.Habit).where(h.Habit.user_id == user.id))
 
         return result
 
     """
-    Получить все привычки с определенным статусом
+    Получить все привычки пользователя с определенным статусом
     """
+    async def get_habits_by_status_async(self, user, status):
+        errors = []#Массив ошибок
 
-    async def get_habits_by_status(self, status):
+        if await self.session.execute(select(u.User).where(u.User.id == user.id)) == None:
+            errors.append("Пользователь не найден!")
+            return errors
+        
         result = await self.session.execute(
-            select(h.Habit).where(h.Habit.status == status)
-        )
+                select(h.Habit).where(
+                    and_(h.Habit.status == status, h.Habit.user_id == user.id)
+                )
+            )
 
         return result
 
     """
     Удалить привычку
     """
-
-    async def delete_habit(self, habit):
+    async def delete_habit_async(self, habit):
         errors = []  # Массив ошибок
 
         result = await self.session.execute(
