@@ -127,7 +127,7 @@ class HabitsRepository(RepositoryBase):  # Репозиторий для при�
     """
     Удалить привычку
     """
-    async def delete_habit(self, habit):
+    async def delete_habit_async(self, habit):
         errors = []  # Массив ошибок
 
         result = await self.session.execute(
