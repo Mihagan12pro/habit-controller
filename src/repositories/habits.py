@@ -82,14 +82,16 @@ class HabitsRepository(RepositoryBase):  # Репозиторий для при�
             await self.progress_repository.add_async(habit)
 
     """
-    Получить привычку по ее названию
+    Получить привычку по ее названию и id пользователя
     """
-    async def get_by_name_async(self, name):
+    async def get_by_name_async(self, title, user_id):
         errors = []  # Массив ошибок
         result = await self.session.execute(
-            select(h.Habit).where(h.Habit.title == name)
+            select(h.Habit).where(and_(
+                h.Habit.title == title,
+                h.Habit.user_id == user_id
+            ))
         )
-
         if result is None:
             errors.append("Такой привычки не существует!")
             return errors
@@ -99,7 +101,7 @@ class HabitsRepository(RepositoryBase):  # Репозиторий для при�
     """
     Получить все привычки пользователя
     """
-    async def get_habits(self, user):
+    async def get_habits_async(self, user):
         result = await self.session.execute(select(h.Habit).where(h.Habit.user_id == user.id))
 
         return result
