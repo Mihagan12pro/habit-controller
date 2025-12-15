@@ -99,8 +99,8 @@ class HabitsRepository(RepositoryBase):  # Репозиторий для при�
     """
     Получить все привычки пользователя
     """
-    async def get_habits(self):
-        result = await self.session.execute(select(h.Habit))
+    async def get_habits(self, user):
+        result = await self.session.execute(select(h.Habit).where(h.Habit.user_id == user.id))
 
         return result
 
