@@ -109,7 +109,7 @@ class HabitsRepository(RepositoryBase):  # Репозиторий для при�
     """
     Получить все привычки пользователя с определенным статусом
     """
-    async def get_habits_by_status(self, user, status):
+    async def get_habits_by_status_async(self, user, status):
         errors = []#Массив ошибок
 
         if await self.session.execute(select(u.User).where(u.User.id == user.id)) == None:
