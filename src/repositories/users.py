@@ -11,7 +11,6 @@ class UsersRepository(RepositoryBase):  # Репозиторий для юзер
     """
     Добавление нового юзера в бд. Используется при регистрации
     """
-
     async def add_async(self, user):
         errors = []  # Массив ошибок
         user.email = user.email.lower()
@@ -29,7 +28,6 @@ class UsersRepository(RepositoryBase):  # Репозиторий для юзер
     """
     Получение пароля пользователя по логину
     """
-
     async def get_password_async(self, id):
         errors = []#Массив ошибок
 
@@ -44,7 +42,6 @@ class UsersRepository(RepositoryBase):  # Репозиторий для юзер
     """
     Получение логина пользователя
     """
-    
     async def get_user_name_async(self, id):
         errors = []#Массив ошибок
 
