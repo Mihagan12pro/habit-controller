@@ -1,5 +1,4 @@
 from typing import List
-
 from pydantic import BaseModel
 
 
@@ -16,7 +15,7 @@ class UserOut(BaseModel):
     email: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True  # Исправили (было orm_mode)
 
 
 # --- Habit DTOs ---
@@ -30,7 +29,7 @@ class HabitOut(BaseModel):
     status: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True  # Исправили (было orm_mode)
 
 
 # --- Progress DTOs ---
@@ -42,5 +41,8 @@ class StatsOut(BaseModel):
     habit_id: int
     habit_title: str
     total_completions: int
-    current_streak: int  # Добавим расчет серии!
-    dates: List[str] 
+    current_streak: int
+    dates: List[str]
+
+    class Config:
+        from_attributes = True  # Добавили на всякий случай
