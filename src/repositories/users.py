@@ -1,7 +1,8 @@
-from repositories.base import RepositoryBase
-from models import user as u
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+
+from models import user as u
+from repositories.base import RepositoryBase
+
 
 class UsersRepository(RepositoryBase):  # Репозиторий для юзеров
     def __init__(self, session):
@@ -10,16 +11,17 @@ class UsersRepository(RepositoryBase):  # Репозиторий для юзер
     """
     Добавление нового юзера в бд. Используется при регистрации
     """
+
     async def add_async(self, user):
-        errors = []#Массив ошибок
-        user.Email = user.Email.lower()
+        errors = []  # Массив ошибок
+        user.email = user.email.lower()
         result = await self.session.execute(select(u.User).filter_by(email=user.email))
         existing_user = result.scalar_one_or_none()
 
         if existing_user is not None:
             errors.append("Пользователь с данной почтой уже существует!")
             return errors
-        
+
         self.session.add(user)
 
         await self.session.commit()
@@ -27,17 +29,15 @@ class UsersRepository(RepositoryBase):  # Репозиторий для юзер
     """
     Получение пароля пользователя по логину
     """
+
     async def get_password(self, name):
         errors = []
-        user = self.session.get(u.User, user.name)
+        user = (
+            await self.session.execute(select(u.User).where(u.User.name == name))
+        ).scalar_one_or_none()
 
-        if user == None:
+        if user is None:
             errors.append("Неверный логин или пароль!")
             return errors
-        
+
         return user.hashed_password
-        
-        
-        
-
-

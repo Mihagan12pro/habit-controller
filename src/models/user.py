@@ -1,10 +1,13 @@
 from __future__ import annotations
 
-from typing import List
+from typing import TYPE_CHECKING, List
 
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.models.base import Base  # Импортируем Base из database.py
+
+if TYPE_CHECKING:
+    from src.models.habit import Habit  # pragma: no cover
 
 
 class User(Base):
