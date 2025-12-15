@@ -4,7 +4,7 @@ from typing import List
 
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from models.base import Base  # Импортируем Base из database.py
+from src.models.base import Base  # Импортируем Base из database.py
 
 
 class User(Base):
