@@ -1,5 +1,5 @@
 from sqlalchemy.future import select
-
+from sqlalchemy import and_
 from models import user as u
 from repositories.base import RepositoryBase
 
@@ -30,14 +30,13 @@ class UsersRepository(RepositoryBase):  # Репозиторий для юзер
     Получение пароля пользователя по логину
     """
 
-    async def get_password(self, name):
-        errors = []
-        user = (
-            await self.session.execute(select(u.User).where(u.User.name == name))
-        ).scalar_one_or_none()
+    async def get_password_async(self, id):
+        errors = []#Массив ошибок
 
-        if user is None:
+        user = await self.session.execute(select(u.User).filter_by(u.User.id == id))
+
+        if user == None:
             errors.append("Неверный логин или пароль!")
             return errors
-
+        
         return user.hashed_password
