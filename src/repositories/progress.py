@@ -13,8 +13,6 @@ class ProgressRepository(RepositoryBase):  # Репозиторий для пр�
     Добавить статистику по привычке. Стоит вызывать в сервисе после успешного добавления новой привычки
     """
     async def add_async(self, habit):
-        errors = []#Массив ошибок
-
         start_date = date.today()
 
         progress = p.Progress()
@@ -28,15 +26,15 @@ class ProgressRepository(RepositoryBase):  # Репозиторий для пр�
     Получить прогресс по привычке
     """
     async def get_by_habit_async(self, habit):
-        errors = []#Массив ошибок
+        progress = await self.session.execute(
+            select(h.Habit).where(h.Habit.id == habit.id)
+        )
 
-        progress = await self.session.execute(select(h.Habit).filter_by(h.Habit.id == habit.id)).first()
-
-        if progress == None:
-            errors.append("Привычка не найдена!")
-            return errors
+        record = progress.first()
+        if record is None:
+            return None
         
-        return progress
+        return record[0]
 
     async def delete_async(self, progress):
         await self.session.delete(progress)

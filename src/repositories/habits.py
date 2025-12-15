@@ -14,20 +14,23 @@ class HabitsRepository(RepositoryBase):  # Репозиторий для при�
     """
     async def add_async(self, user, title):
         errors = []#Массив ошибок
-        check_user_existing = await self.session.execute(select(u.User).filter_by(u.User.id == user.id))
+        check_user_existing = (
+            await self.session.execute(select(u.User).where(u.User.id == user.id))
+        ).scalar_one_or_none()
 
-        if check_user_existing == None:
+        if check_user_existing is None:
             errors.append("Пользователя не существует!")
             return errors
         
-        check_habit_exists = await self.session.execute(select(h.Habit).filter_by(
-                and_(
-                    h.Habit.title == habit.title,
-                    h.Habit.user_id == habit.user_id
+        check_habit_exists = (
+            await self.session.execute(
+                select(h.Habit).where(
+                    and_(h.Habit.title == title, h.Habit.user_id == user.id)
                 )
-            ))
+            )
+        ).scalar_one_or_none()
         
-        if check_habit_exists != None:
+        if check_habit_exists is not None:
             errors.append("Привычка с данным названием уже существует!")
             return errors
         
@@ -41,28 +44,34 @@ class HabitsRepository(RepositoryBase):  # Репозиторий для при�
 
         await self.session.commit()
 
-        await self.session.progress_repository.add_async(self, habit)#Привычка создается - создаается статистика
+        if self.progress_repository:
+            await self.progress_repository.add_async(habit)#Привычка создается - создаается статистика
 
     """
     Обновление статуса привычки
     """
     async def update_status_async(self, id, status):
          errors = []#Массив ошибок
-         result = await self.session.execute(select(h.Habit).filter_by(h.Habit.id == id))
+         result = await self.session.execute(
+             select(h.Habit).where(h.Habit.id == id)
+         )
 
-         if result == None:
+         habit = result.scalar_one_or_none()
+
+         if habit is None:
             errors.append("Такой привычки не существует!")
             return errors
          
-         habit = result.first()
          habit.status = status
 
          await self.session.commit()
 
-         progress = await self.progress_repository.get_by_habit_async(habit).first()#По любому при изменении статуса привычки статистика сбросится
-         await self.progress_repository.delete_async(progress)
+         if self.progress_repository:
+             progress = await self.progress_repository.get_by_habit_async(habit)#По любому при изменении статуса привычки статистика сбросится
+             if progress:
+                 await self.progress_repository.delete_async(progress)
 
-         if status == habit.start:#Но статус "start", то создастся новая статистика, т.к. человек, к примеру, хотел бросить курить, но сорвался и покурил, тем самым начал как-бы заново
+         if self.progress_repository and status == habit.started:#Но статус "start", то создастся новая статистика, т.к. человек, к примеру, хотел бросить курить, но сорвался и покурил, тем самым начал как-бы заново
             await self.progress_repository.add_async(habit)
 
     """
@@ -70,9 +79,9 @@ class HabitsRepository(RepositoryBase):  # Репозиторий для при�
     """
     async def get_by_name_async(self, name):
         errors = []#Массив ошибок
-        result = await self.session.execute(select(h.Habit).filter_by(h.Habit.name == name))
+        result = await self.session.execute(select(h.Habit).where(h.Habit.title == name))
 
-        if result == None:
+        if result is None:
             errors.append("Такой привычки не существует!")
             return errors
         
@@ -90,7 +99,7 @@ class HabitsRepository(RepositoryBase):  # Репозиторий для при�
     Получить все привычки с определенным статусом
     """
     async def get_habits_by_status(self, status):
-         result = await self.session.execute(select(h.Habit).filter_by(h.Habit.status == status))
+         result = await self.session.execute(select(h.Habit).where(h.Habit.status == status))
 
          return result
     
@@ -100,15 +109,17 @@ class HabitsRepository(RepositoryBase):  # Репозиторий для при�
     async def delete_habit(self, habit):
          errors = []#Массив ошибок
 
-         result = await self.session.execute(select(h.Habit).filter_by(h.Habit.id == habit.id))
+         result = await self.session.execute(select(h.Habit).where(h.Habit.id == habit.id))
 
-         if result.first() == None:
+         if result.first() is None:
              errors.append("Данной привычки не существует!")
 
              return errors
          
-         progress = await self.progress_repository.get_by_habit_async(habit).first()
-         await self.progress_repository.delete_async(progress)#Сперва удалим прогресс, т.к. в нем содержится внешний ключ на привычку
+         if self.progress_repository:
+             progress = await self.progress_repository.get_by_habit_async(habit)
+             if progress:
+                 await self.progress_repository.delete_async(progress)#Сперва удалим прогресс, т.к. в нем содержится внешний ключ на привычку
 
          await self.session.delete(habit)
          await self.session.commit()

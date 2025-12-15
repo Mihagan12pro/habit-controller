@@ -1,11 +1,15 @@
 from __future__ import annotations
 
-from typing import List
+from typing import List, TYPE_CHECKING
 
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.models.base import Base
+
+if TYPE_CHECKING:
+    from src.models.user import User  # pragma: no cover
+    from src.models.progress import Progress  # pragma: no cover
 
 
 class Habit(Base):
