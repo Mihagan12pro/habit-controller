@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from sqlalchemy import ForeignKey
+from datetime import date
+
+from sqlalchemy import Date, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.models.base import Base
@@ -10,7 +12,8 @@ class Progress(Base):
     __tablename__ = "progress_table"
 
     id: Mapped[int] = mapped_column(primary_key=True)  # Обязательно нужен PK
-    start_date: Mapped[str] = mapped_column(nullable=False)
+    # Храним календарную дату (без времени)
+    start_date: Mapped[date] = mapped_column(Date, nullable=False)
 
     habit_id: Mapped[int] = mapped_column(ForeignKey("habits_table.id"))
 

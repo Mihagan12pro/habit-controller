@@ -1,3 +1,5 @@
+from datetime import date
+
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -14,17 +16,17 @@ def create_new_habit(db: Session, user_id: int, habit_dto: schemas.HabitCreate):
     return new_habit
 
 
-def track_progress(db: Session, habit_id: int, date: str):
+def track_progress(db: Session, habit_id: int, day: date):
     # Проверка на дубликаты
     stmt = select(Progress).where(
-        Progress.habit_id == habit_id, Progress.start_date == date
+        Progress.habit_id == habit_id, Progress.start_date == day
     )
     existing = db.execute(stmt).scalar_one_or_none()
 
     if existing:
         return None  # Уже отмечено
 
-    new_record = Progress(habit_id=habit_id, start_date=date)
+    new_record = Progress(habit_id=habit_id, start_date=day)
     db.add(new_record)
     db.commit()
     return new_record

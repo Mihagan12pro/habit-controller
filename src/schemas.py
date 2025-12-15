@@ -1,4 +1,5 @@
 from typing import List
+from datetime import date
 from pydantic import BaseModel
 
 
@@ -34,7 +35,7 @@ class HabitOut(BaseModel):
 
 # --- Progress DTOs ---
 class ProgressCreate(BaseModel):
-    date: str  # YYYY-MM-DD
+    date: date  # YYYY-MM-DD
 
 
 class StatsOut(BaseModel):
@@ -42,7 +43,7 @@ class StatsOut(BaseModel):
     habit_title: str
     total_completions: int
     current_streak: int
-    dates: List[str]
+    dates: List[date]
 
     class Config:
         from_attributes = True  # Добавили на всякий случай

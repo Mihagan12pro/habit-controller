@@ -2,7 +2,7 @@ from repositories.base import RepositoryBase
 from models import progress as p
 from models import habit as h
 from sqlalchemy.future import select
-import datetime
+from datetime import date
 
 
 class ProgressRepository(RepositoryBase):  # Репозиторий для прогресса по привычке
@@ -15,7 +15,7 @@ class ProgressRepository(RepositoryBase):  # Репозиторий для пр�
     async def add_async(self, habit):
         errors = []#Массив ошибок
 
-        start_date = datetime.datetime.now()
+        start_date = date.today()
 
         progress = p.Progress()
         progress.habit_id = habit.habit_id
