@@ -1,9 +1,9 @@
 from fastapi import FastAPI
 
 from src.database import engine
-from src.routers.users import router as users_router
-from src.routers.habits import router as habits_router
 from src.models.base import Base
+from src.routers.habits import router as habits_router
+from src.routers.users import router as users_router
 
 # Создаем таблицы при старте
 Base.metadata.create_all(bind=engine)
