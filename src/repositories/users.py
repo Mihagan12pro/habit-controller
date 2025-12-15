@@ -40,3 +40,18 @@ class UsersRepository(RepositoryBase):  # Репозиторий для юзер
             return errors
         
         return user.hashed_password
+    
+    """
+    Получение логина пользователя
+    """
+    
+    async def get_user_name_async(self, id):
+        errors = []#Массив ошибок
+
+        user = await self.session.execute(select(u.User).filter_by(u.User.id == id))
+
+        if user == None:
+            errors.append("Пользователя с данным id не существует!")
+            return errors
+        
+        return user.name
