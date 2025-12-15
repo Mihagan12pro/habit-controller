@@ -1,6 +1,5 @@
 from repositories.base import RepositoryBase
 from models import user as u
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
 class UsersRepository(RepositoryBase):  # Репозиторий для юзеров
