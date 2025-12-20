@@ -67,8 +67,25 @@ class HabitsRepository(RepositoryBase):  # Репозиторий для при�
             return "Привычка не найдена!"
         
         await self.progress_repository.delete(habit)
-        
+
         await self.session.delete(habit)
+        await self.session.commit()
+    
+    """
+    Обновление статуса привычки
+    """
+    async def change_status(self, habit_id : int, new_status : str):
+        habit = await self.get_by_id(habit_id)
+        if habit == None:
+            return "Привычка не найдена!"
+        
+        habit.status = new_status
+
+        if new_status == habit.started:
+            await self.progress_repository.create(habit)
+        else:
+            await self.progress_repository.delete(habit)
+        
         await self.session.commit()
         
 
