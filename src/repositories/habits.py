@@ -1,7 +1,5 @@
 from src.schemas import HabitCreate
 
-from datetime import date
-
 from typing import List, Optional, Union
 
 from sqlalchemy import select
@@ -14,21 +12,29 @@ from src.repositories.base import RepositoryBase
 class HabitsRepository(RepositoryBase):  # Репозиторий для привычек
     def __init__(self, session: AsyncSession):
         super().__init__(session)
+    
+    progress_repository = None  # Обязательно надо инициализировать поле
 
+    """
+    Получить привычку по названию
+    """
     async def get_by_title(self, title: str) -> Optional[Habit]:
-        """Получить привычку по названию"""
         stmt = select(Habit).where(Habit.title == title)
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
 
+    """
+    Получить привычку по id
+    """
     async def get_by_id(self, habit_id: int) -> Optional[Habit]:
-        """Получить привычку по id"""
         stmt = select(Habit).where(Habit.id == habit_id)
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
-
-    async def get_by_user_id(self, user_id: int) -> List[Habit]:
-        """Получить все привычки пользователя"""
+    
+    """
+    Получить все привычки пользователя
+    """
+    async def get_habits(self, user_id: int) -> List[Habit]:
         stmt = select(Habit).where(Habit.user_id == user_id)
         result = await self.session.execute(stmt)
         return list(result.scalars().all())
@@ -39,7 +45,6 @@ class HabitsRepository(RepositoryBase):  # Репозиторий для при�
     async def create(self, user_id : int, habit_dto: HabitCreate) -> Union[int, str]:
         habit = Habit()
         habit.user_id = user_id
-        habit.started = date.today()
         habit.title = habit_dto.title
 
         if await self.get_by_title(habit.title) != None:
@@ -48,5 +53,9 @@ class HabitsRepository(RepositoryBase):  # Репозиторий для при�
         self.session.add(habit)
         await self.session.commit()
         await self.session.refresh(habit)
-        
+
+        await self.progress_repository.cre
+
         return habit.id
+    
+

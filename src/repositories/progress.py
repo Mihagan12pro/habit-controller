@@ -1,6 +1,8 @@
 from datetime import date
 from typing import List, Optional, Union
 
+from src.models.habit import Habit
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -27,7 +29,12 @@ class ProgressRepository(RepositoryBase):  # Репозиторий для пр�
     """
     Создать новую запись прогресса
     """
-    async def create(self, progress: Progress) -> Progress:
+    async def create(self, habit: Habit) -> int:
+
+        progress = Progress()
+        progress.habit_id = habit.id
+        progress.start_date = date.today()
+
         self.session.add(progress)
         await self.session.commit()
         await self.session.refresh(progress)
