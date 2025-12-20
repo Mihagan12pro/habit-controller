@@ -82,3 +82,27 @@ async def reset_anti_habit_counter(db: AsyncSession, anti_habit_id: int):
         "user_id": updated.user_id,
         "duration_seconds": duration_seconds,
     }
+
+
+async def get_user_anti_habits_stats(db: AsyncSession, user_id: int):
+    """Get statistics for all anti-habits of a user"""
+    anti_habits_repo = AntiHabitsRepository(db)
+
+    # Получаем все анти-привычки пользователя
+    anti_habits = await anti_habits_repo.get_by_user_id(user_id)
+
+    now = datetime.now()
+    stats = []
+    for ah in anti_habits:
+        # Вычисляем длительность в секундах
+        duration_seconds = int((now - ah.started_at).total_seconds())
+
+        stats.append(
+            {
+                "anti_habit_id": ah.id,
+                "anti_habit_title": ah.title,
+                "duration_seconds": duration_seconds,
+                "started_at": ah.started_at,
+            }
+        )
+    return stats

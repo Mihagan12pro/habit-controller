@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 from typing import List
 
 from pydantic import BaseModel
@@ -57,3 +57,13 @@ class AntiHabitCreate(BaseModel):
 
 class AntiHabitOut(BaseModel):
     pass
+
+
+class AntiHabitStatsOut(BaseModel):
+    anti_habit_id: int
+    anti_habit_title: str
+    duration_seconds: int
+    started_at: datetime
+
+    class Config:
+        from_attributes = True
