@@ -1,6 +1,6 @@
 from typing import Union
 
-from Shared.httpExceptions import check_errors
+from shared.httpExceptions import check_errors
 
 from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError

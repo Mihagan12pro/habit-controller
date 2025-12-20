@@ -1,4 +1,8 @@
-from typing import List, Optional
+from src.schemas import HabitCreate
+
+from datetime import date
+
+from typing import List, Optional, Union
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -29,9 +33,20 @@ class HabitsRepository(RepositoryBase):  # Репозиторий для при�
         result = await self.session.execute(stmt)
         return list(result.scalars().all())
 
-    async def create(self, habit: Habit) -> Habit:
-        """Создать новую привычку"""
+    """
+    Создать новую привычку
+    """
+    async def create(self, user_id : int, habit_dto: HabitCreate) -> Union[int, str]:
+        habit = Habit()
+        habit.user_id = user_id
+        habit.started = date.today()
+        habit.title = habit_dto.title
+
+        if await self.get_by_title(habit.title) != None:
+            return 'Привычка с данным названием уже существует!'
+        
         self.session.add(habit)
         await self.session.commit()
         await self.session.refresh(habit)
-        return habit
+        
+        return habit.id
