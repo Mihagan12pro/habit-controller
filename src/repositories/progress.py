@@ -17,12 +17,12 @@ class ProgressRepository(RepositoryBase):  # Репозиторий для пр�
     """
     Получить прогресс по id привычки
     """
-    async def get_by_habit_id(self, habit_id: int) -> Union[Progress, str]:
-        stmt = select(Progress).where(Progress.habit_id == habit_id)
+    async def get_by_habit(self, habit: Habit) -> Union[Progress, str]:
+        stmt = select(Progress).where(Progress.habit_id == habit.id)
         result = await self.session.execute(stmt)
 
         if result == None:
-            return "Прогресс по привычке не был найден!"
+            return "Привычка не найдена!"
 
         return result.scalar_one()
 
@@ -39,3 +39,22 @@ class ProgressRepository(RepositoryBase):  # Репозиторий для пр�
         await self.session.commit()
         await self.session.refresh(progress)
         return progress
+    
+        
+    """
+    Удалить прогресс. 
+    Метод вызывается, когда статус 
+    привычки меняется на 'выработана'/'заморожена' 
+    или привычка удаляется
+    """
+    async def delete(self, habit : Habit):
+        habit_id = habit.id
+
+        progress_result = await self.get_by_id(habit)
+
+        if isinstance(progress_result, str):
+            return progress_result
+
+        await self.session.delete(progress_result)
+        await self.session.commit()
+

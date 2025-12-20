@@ -54,8 +54,23 @@ class HabitsRepository(RepositoryBase):  # Репозиторий для при�
         await self.session.commit()
         await self.session.refresh(habit)
 
-        await self.progress_repository.cre
+        # await self.progress_repository.cre
 
         return habit.id
+    
+    """
+    Удалить привычку
+    """
+    async def delete(self, habit_id : int):
+        habit = await self.get_by_id(habit_id)
+        if habit == None:
+            return "Привычка не найдена!"
+        
+        await self.progress_repository.delete(habit)
+        
+        await self.session.delete(habit)
+        await self.session.commit()
+        
+
     
 
