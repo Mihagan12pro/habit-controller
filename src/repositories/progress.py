@@ -1,43 +1,34 @@
-from repositories.base import RepositoryBase
-from models import progress as p
-from models import habit as h
-from sqlalchemy.future import select
 from datetime import date
+from typing import List, Optional
+
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from src.models.progress import Progress
+from src.repositories.base import RepositoryBase
 
 
 class ProgressRepository(RepositoryBase):  # Репозиторий для прогресса по привычке
-    def __init__(self, session):
+    def __init__(self, session: AsyncSession):
         super().__init__(session)
-    
-    """
-    Добавить статистику по привычке. Стоит вызывать в сервисе после успешного добавления новой привычки
-    """
-    async def add_async(self, habit):
-        errors = []#Массив ошибок
 
-        start_date = date.today()
+    async def get_by_habit_id(self, habit_id: int) -> List[Progress]:
+        """Получить весь прогресс по привычке"""
+        stmt = select(Progress).where(Progress.habit_id == habit_id)
+        result = await self.session.execute(stmt)
+        return list(result.scalars().all())
 
-        progress = p.Progress()
-        progress.habit_id = habit.habit_id
-        progress.start_date = start_date
+    async def get_by_habit_id_and_date(self, habit_id: int, day: date) -> Optional[Progress]:
+        """Получить прогресс по привычке и дате"""
+        stmt = select(Progress).where(
+            Progress.habit_id == habit_id, Progress.start_date == day
+        )
+        result = await self.session.execute(stmt)
+        return result.scalar_one_or_none()
 
+    async def create(self, progress: Progress) -> Progress:
+        """Создать новую запись прогресса"""
         self.session.add(progress)
         await self.session.commit()
-
-    """
-    Получить прогресс по привычке
-    """
-    async def get_by_habit_async(self, habit):
-        errors = []#Массив ошибок
-
-        progress = await self.session.execute(select(h.Habit).filter_by(h.Habit.id == habit.id)).first()
-
-        if progress == None:
-            errors.append("Привычка не найдена!")
-            return errors
-        
+        await self.session.refresh(progress)
         return progress
-
-    async def delete_async(self, progress):
-        await self.session.delete(progress)
-        await self.session.commit()

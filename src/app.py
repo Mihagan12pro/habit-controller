@@ -5,10 +5,14 @@ from src.routers.users import router as users_router
 from src.routers.habits import router as habits_router
 from src.models.base import Base
 
-# Создаем таблицы при старте
-Base.metadata.create_all(bind=engine)
 
-app = FastAPI(title="Flawless App API")
+async def init_db():
+    """Инициализация базы данных - создание таблиц"""
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+
+
+app = FastAPI(title="Flawless App API", on_startup=[init_db])
 
 # Подключаем роутеры
 app.include_router(users_router)
@@ -16,5 +20,5 @@ app.include_router(habits_router)
 
 
 @app.get("/")
-def root():
+async def root():
     return {"message": "Flawless API is running!"}

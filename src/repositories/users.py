@@ -1,43 +1,31 @@
-from repositories.base import RepositoryBase
-from models import user as u
+from typing import Optional
+
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.future import select
+
+from src.models.user import User
+from src.repositories.base import RepositoryBase
+
 
 class UsersRepository(RepositoryBase):  # Репозиторий для юзеров
-    def __init__(self, session):
+    def __init__(self, session: AsyncSession):
         super().__init__(session)
 
-    """
-    Добавление нового юзера в бд. Используется при регистрации
-    """
-    async def add_async(self, user):
-        errors = []#Массив ошибок
-        user.Email = user.Email.lower()
-        result = await self.session.execute(select(u.User).filter_by(email=user.email))
-        existing_user = result.scalar_one_or_none()
+    async def get_by_email(self, email: str) -> Optional[User]:
+        """Получить пользователя по email"""
+        stmt = select(User).where(User.email == email)
+        result = await self.session.execute(stmt)
+        return result.scalar_one_or_none()
 
-        if existing_user is not None:
-            errors.append("Пользователь с данной почтой уже существует!")
-            return errors
-        
+    async def get_by_id(self, user_id: int) -> Optional[User]:
+        """Получить пользователя по id"""
+        stmt = select(User).where(User.id == user_id)
+        result = await self.session.execute(stmt)
+        return result.scalar_one_or_none()
+
+    async def create(self, user: User) -> User:
+        """Создать нового пользователя"""
         self.session.add(user)
-
         await self.session.commit()
-
-    """
-    Получение пароля пользователя по логину
-    """
-    async def get_password(self, name):
-        errors = []
-        user = self.session.get(u.User, user.name)
-
-        if user == None:
-            errors.append("Неверный логин или пароль!")
-            return errors
-        
-        return user.hashed_password
-        
-        
-        
-
-
+        await self.session.refresh(user)
+        return user
