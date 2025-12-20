@@ -12,18 +12,25 @@ class UsersRepository(RepositoryBase):  # Репозиторий для юзер
     def __init__(self, session: AsyncSession):
         super().__init__(session)
 
+    """
+    Получить пользователя по email
+    """
     async def get_by_email(self, email: str) -> Union[User, str]:
-        """Получить пользователя по email"""
         stmt = select(User).where(User.email == email)
         result = await self.session.execute(stmt)
+        if result == None:
+            return "Пользователь с данной почтой не найден!"
+
         return result.scalar_one_or_none()
 
     """
     Получить пользователя по id
     """
-    async def get_by_id(self, user_id: int) -> Optional[User]:
+    async def get_by_id(self, user_id: int) -> Union[User, str]:
         stmt = select(User).where(User.id == user_id)
         result = await self.session.execute(stmt)
+        if result == None:
+            return "Пользователь с данным id не найден!"
         return result.scalar_one_or_none()
 
     """
