@@ -48,3 +48,12 @@ class StatsOut(BaseModel):
 
     class Config:
         from_attributes = True  # Добавили на всякий случай
+
+
+# --- AntiHabit DTOs ---
+class AntiHabitCreate(BaseModel):
+    pass
+
+
+class AntiHabitOut(BaseModel):
+    pass
