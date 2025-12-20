@@ -1,3 +1,5 @@
+from Shared.httpExceptions import check_errors
+
 from datetime import date
 
 from fastapi import HTTPException

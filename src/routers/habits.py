@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src import schemas
 from src.database import get_db
-from src.services.habit_service import create_new_habit, get_user_stats, track_progress
+from services.habits_service import create_new_habit, get_user_stats, track_progress
 
 router = APIRouter(prefix="/habits", tags=["Habits"])
 
