@@ -25,12 +25,34 @@ async def create_new_habit(
 
     return habits_result
 
-async def get_all_habits(  db: AsyncSession, user_id: int):
+async def get_all_habits( 
+    db: AsyncSession, user_id: int
+):
     habits_repository = HabitsRepository(db)
-    result = habits_repository.get_habits(user_id)
+    result = await habits_repository.get_habits(user_id)
     check_errors(result, 404)
 
     return result
+
+async def delete( 
+    db: AsyncSession, habit_id : int
+):
+     habits_repository = HabitsRepository(db)
+     result = await habits_repository.delete(habit_id)
+     check_errors(result, 404)
+
+     return result
+
+async def change_status( 
+    db: AsyncSession, habit_id : int, status : str
+):
+     habits_repository = HabitsRepository(db)
+     result = await habits_repository.change_status(habit_id, status)
+     check_errors(result, 404)
+
+     return result
+    
+
 
 # async def track_progress(db: AsyncSession, habit_id: int, day: date):
 #     progress_repo = ProgressRepository(db)
