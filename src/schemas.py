@@ -39,12 +39,6 @@ class ProgressCreate(BaseModel):
     date: date  # YYYY-MM-DD
 
 
-class StatsOut(BaseModel):
-    habit_id: int
-    habit_title: str
-    total_completions: int
-    current_streak: int
-    dates: List[date]
-
-    class Config:
-        from_attributes = True  # Добавили на всякий случай
+class ProgressOut(BaseModel):
+    time_passed : str
+    

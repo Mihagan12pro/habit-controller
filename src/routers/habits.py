@@ -24,6 +24,6 @@ async def track_habit(
     return await track_habit_progress(db, habit_id, progress.date)
 
 
-@router.get("/{user_id}/stats", response_model=List[schemas.StatsOut])
+@router.get("/{user_id}/stats", response_model=List[schemas.ProgressOut])
 async def get_stats(user_id: int, db: AsyncSession = Depends(get_db)):
     return await get_user_stats(db, user_id)

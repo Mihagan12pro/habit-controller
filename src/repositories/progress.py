@@ -1,5 +1,9 @@
 from datetime import date
-from typing import List, Optional, Union
+import datetime
+
+from typing import Union
+
+from src.schemas import ProgressOut
 
 from src.models.habit import Habit
 
@@ -23,8 +27,13 @@ class ProgressRepository(RepositoryBase):  # Репозиторий для пр�
 
         if result == None:
             return "Привычка не найдена!"
+        
+        date_start = datetime.strptime(result.scalar_one().start_date, '%Y-%m-%d').date()
+        now = date.today()
 
-        return result.scalar_one()
+        progress_result = ProgressOut(str(now - date_start))
+
+        return progress_result
 
     """
     Создать новую запись прогресса
@@ -57,4 +66,6 @@ class ProgressRepository(RepositoryBase):  # Репозиторий для пр�
 
         await self.session.delete(progress_result)
         await self.session.commit()
+    
+    
 

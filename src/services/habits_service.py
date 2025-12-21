@@ -1,14 +1,9 @@
 from shared.httpExceptions import check_errors
 
-from fastapi import HTTPException
-from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src import schemas
-from src.models.habit import Habit
-from src.models.progress import Progress
 from src.repositories.habits import HabitsRepository
-from src.repositories.progress import ProgressRepository
 from src.repositories.users import UsersRepository
 
 
