@@ -1,13 +1,10 @@
 from typing import Union
 
-from shared.httpExceptions import check_errors
+from services.shared.httpExceptions import check_errors
 
-from fastapi import HTTPException
-from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src import schemas
-from src.models.user import User
 from src.repositories.users import UsersRepository
 
 

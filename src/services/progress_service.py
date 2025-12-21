@@ -1,4 +1,4 @@
-from shared.httpExceptions import check_errors
+from src.services.shared.httpExceptions import check_errors
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
