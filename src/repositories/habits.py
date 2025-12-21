@@ -16,9 +16,9 @@ class HabitsRepository(RepositoryBase):  # Репозиторий для при�
     progress_repository = None  # Обязательно надо инициализировать поле
 
     """
-    Получить привычку по названию
+    Получить id привычки
     """
-    async def get_by_title(self, title: str) -> Optional[Habit]:
+    async def get_by_title(self, title: str, user_id: int) -> Optional[Habit]:
         stmt = select(Habit).where(Habit.title == title)
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
