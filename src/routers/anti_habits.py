@@ -8,7 +8,6 @@ from src.database import get_db
 from src.services.anti_habit_service import (
     create_anti_habit,
     get_all_anti_habits,
-    get_user_anti_habits_stats,
     reset_anti_habit_counter,
 )
 
@@ -37,9 +36,3 @@ async def get_all_anti_habits_endpoint(
 async def reset_anti_habit_endpoint(id: int, db: AsyncSession = Depends(get_db)):
     """Reset the counter for an anti-habit"""
     return await reset_anti_habit_counter(db, id)
-
-
-@router.get("/{user_id}/stats", response_model=List[schemas.AntiHabitStatsOut])
-async def get_anti_habits_stats(user_id: int, db: AsyncSession = Depends(get_db)):
-    """Get statistics for all anti-habits of a user"""
-    return await get_user_anti_habits_stats(db, user_id)
