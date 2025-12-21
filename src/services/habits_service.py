@@ -1,5 +1,7 @@
 from shared.httpExceptions import check_errors
 
+from schemas import HabitOut
+
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src import schemas
@@ -27,7 +29,13 @@ async def get_all_habits(
     result = await habits_repository.get_habits(user_id)
     check_errors(result, 404)
 
-    return result
+    habits_out = []
+
+    for i in result:
+        habit_out = HabitOut(i.id, i.title, i.status)
+        habits_out.append(habit_out)
+
+    return habits_out
 
 async def delete( 
     db: AsyncSession, habit_id : int

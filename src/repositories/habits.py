@@ -29,6 +29,10 @@ class HabitsRepository(RepositoryBase):  # Репозиторий для при�
     async def get_by_id(self, habit_id: int) -> Optional[Habit]:
         stmt = select(Habit).where(Habit.id == habit_id)
         result = await self.session.execute(stmt)
+
+        if result == None:
+            return 'Привычка не найдена!'
+
         return result.scalar_one_or_none()
     
     """
