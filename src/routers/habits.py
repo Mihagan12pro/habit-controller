@@ -19,8 +19,8 @@ async def create_habit(
 ):
     return await create_new_habit(db, user_id, habit)
 
-@router.get('/{user_id}/all', response_model=schemas.HabitOut)
-async def get_all_habits(
+@router.get('/{user_id}/all', response_model=List[schemas.HabitOut])
+async def show_all_habits(
     user_id: int,
     db: AsyncSession = Depends(get_db)
 ):
