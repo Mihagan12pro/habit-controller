@@ -1,11 +1,11 @@
-from typing import Optional, Union
+from typing import Union
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+import src.schemas as dto
 from src.models.user import User
 from src.repositories.base import RepositoryBase
-import src.schemas as dto
 
 
 class UsersRepository(RepositoryBase):  # Репозиторий для юзеров
@@ -44,8 +44,8 @@ class UsersRepository(RepositoryBase):  # Репозиторий для юзер
 
         email_result = await self.get_by_email(user.email)
 
-        if isinstance(email_result, User) == False:
-            return 'Данная почта уже занята!'
+        if email_result is not None:
+            return "Данная почта уже занята!"
                 
         self.session.add(user)
         await self.session.commit()
