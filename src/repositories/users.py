@@ -29,6 +29,7 @@ class UsersRepository(RepositoryBase):  # Репозиторий для юзер
     async def get_by_id(self, user_id: int) -> Union[User, str]:
         stmt = select(User).where(User.id == user_id)
         result = await self.session.execute(stmt)
+        print(result)
         if result == None:
             return "Пользователь с данным id не найден!"
         return result.scalar_one_or_none()
@@ -44,8 +45,8 @@ class UsersRepository(RepositoryBase):  # Репозиторий для юзер
 
         email_result = await self.get_by_email(user.email)
 
-        if isinstance(email_result, User) == False:
-            return 'Данная почта уже занята!'
+        if email_result is not None:
+            return "Данная почта уже занята!"
                 
         self.session.add(user)
         await self.session.commit()
