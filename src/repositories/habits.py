@@ -15,18 +15,14 @@ class HabitsRepository(RepositoryBase):  # Репозиторий для при�
     
     progress_repository = None  # Обязательно надо инициализировать поле
 
-    """
-    Получить id привычки
-    """
     async def get_by_title(self, title: str, user_id: int) -> Optional[Habit]:
+        """Получить id привычки"""
         stmt = select(Habit).where(Habit.title == title)
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
 
-    """
-    Получить привычку по id
-    """
     async def get_by_id(self, habit_id: int) -> Optional[Habit]:
+        """Получить привычку по id"""
         stmt = select(Habit).where(Habit.id == habit_id)
         result = await self.session.execute(stmt)
 
@@ -35,37 +31,29 @@ class HabitsRepository(RepositoryBase):  # Репозиторий для при�
 
         return result.scalar_one_or_none()
     
-    """
-    Получить все привычки пользователя
-    """
     async def get_habits(self, user_id: int) -> List[Habit]:
+        """Получить все привычки пользователя"""
         stmt = select(Habit).where(Habit.user_id == user_id)
         result = await self.session.execute(stmt)
         return list(result.scalars().all())
 
-    """
-    Создать новую привычку
-    """
     async def create(self, user_id : int, habit_dto: HabitCreate) -> Union[int, str]:
+        """Создать новую привычку"""
         habit = Habit()
         habit.user_id = user_id
         habit.title = habit_dto.title
 
-        if await self.get_by_title(habit.title) != None:
+        if await self.get_by_title(habit.title, user_id) != None:
             return 'Привычка с данным названием уже существует!'
         
         self.session.add(habit)
         await self.session.commit()
         await self.session.refresh(habit)
 
-        # await self.progress_repository.cre
-
         return habit.id
     
-    """
-    Удалить привычку
-    """
     async def delete(self, habit_id : int):
+        """Удалить привычку"""
         habit = await self.get_by_id(habit_id)
         if habit == None:
             return "Привычка не найдена!"
