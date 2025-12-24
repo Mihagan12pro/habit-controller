@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-
+from fastapi import HTTPException
 from src import schemas
 from src.repositories.habits import HabitsRepository
 from src.repositories.users import UsersRepository
@@ -9,16 +9,24 @@ from src.services.shared.httpExceptions import check_errors
 
 async def create_new_habit(
     db: AsyncSession, user_id: int, habit_dto: schemas.HabitCreate
-):
+) -> HabitOut:  # Теперь сервис возвращает Pydantic-схему
     users_repository = UsersRepository(db)
-    user_result = await users_repository.get_by_id(user_id)
-    check_errors(user_result, 404)
+    user_result = await users_repository.get_by_id(
+        user_id
+    )
+    
+    if user_result is None:
+        raise HTTPException(status_code=404, detail="Пользователь не найден")
 
     habits_repository = HabitsRepository(db)
     habits_result = await habits_repository.create(user_id, habit_dto)
-    check_errors(habits_result, 400)
 
-    return habits_result
+    if habits_result is None:
+        raise HTTPException(
+            status_code=400, detail="Привычка с таким названием уже существует"
+        )
+
+    return HabitOut.model_validate(habits_result)
 
 
 async def get_all_habits(db: AsyncSession, user_id: int):

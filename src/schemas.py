@@ -20,17 +20,20 @@ class UserOut(BaseModel):
 
 
 # --- Habit DTOs ---
-class HabitCreate(BaseModel):
+class HabitBase(BaseModel):
     title: str
+    # status делаем опциональным со значением по умолчанию,
+    # чтобы не обязательно было отправлять его при создании
+    status: str = "start"
 
+class HabitCreate(HabitBase):
+    pass
 
-class HabitOut(BaseModel):
+class HabitOut(HabitBase):
     id: int
-    title: str
-    status: str
 
     class Config:
-        from_attributes = True  # Исправили (было orm_mode)
+        orm_mode = True
 
 
 # --- Progress DTOs ---

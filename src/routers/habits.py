@@ -11,12 +11,15 @@ from src.services.progress_service import track_habit_progress
 router = APIRouter(prefix="/habits", tags=["Habits"])
 
 
-@router.post("/{user_id}/habits")
+@router.post(
+    "/{user_id}/habits",
+    response_model=schemas.HabitOut
+)
 async def create_habit(
-    user_id: int, habit: schemas.HabitCreate, db: AsyncSession = Depends(get_db)
-):
+    user_id: int,
+    habit: schemas.HabitCreate,
+    db: AsyncSession = Depends(get_db)):
     return await create_new_habit(db, user_id, habit)
-
 
 @router.get("/{user_id}/all", response_model=List[schemas.HabitOut])
 async def show_all_habits(user_id: int, db: AsyncSession = Depends(get_db)):

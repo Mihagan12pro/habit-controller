@@ -39,20 +39,21 @@ class HabitsRepository(RepositoryBase):  # Репозиторий для при�
         result = await self.session.execute(stmt)
         return list(result.scalars().all())
 
-    async def create(self, user_id: int, habit_dto: HabitCreate) -> Union[int, str]:
-        """Создать новую привычку"""
+    async def create(self, user_id: int, habit_dto: HabitCreate) -> Optional[Habit]:
+        """Создать новую привычку для пользователя"""
+        if await self.get_by_title(habit_dto.title, user_id) is not None:
+            return None
+
         habit = Habit()
         habit.user_id = user_id
         habit.title = habit_dto.title
-
-        if await self.get_by_title(habit.title, habit.user_id) is not None:
-            return "Привычка с данным названием уже существует!"
+        
 
         self.session.add(habit)
         await self.session.commit()
         await self.session.refresh(habit)
 
-        return habit.id
+        return habit
 
     async def delete(self, habit_id: int):
         """Удалить привычку"""
