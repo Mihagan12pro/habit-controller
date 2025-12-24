@@ -16,7 +16,10 @@ class HabitsRepository(RepositoryBase):  # Репозиторий для при�
 
     async def get_by_title(self, title: str, user_id: int) -> Optional[Habit]:
         """Получить id привычки"""
-        stmt = select(Habit).where(Habit.title == title)
+        stmt = select(Habit).where(
+            Habit.title == title,
+            Habit.user_id == user_id,
+        )
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
 
@@ -42,7 +45,7 @@ class HabitsRepository(RepositoryBase):  # Репозиторий для при�
         habit.user_id = user_id
         habit.title = habit_dto.title
 
-        if await self.get_by_title(habit.title, user_id) != None:
+        if await self.get_by_title(habit.title, habit.user_id) is not None:
             return "Привычка с данным названием уже существует!"
 
         self.session.add(habit)

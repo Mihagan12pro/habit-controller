@@ -17,8 +17,8 @@ class Habit(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     title: Mapped[str] = mapped_column(
-        nullable=False, unique=True
-    )  # Исправил tittle на title
+        nullable=False
+    )
     status: Mapped[str] = mapped_column(default="start")
 
     user_id: Mapped[int] = mapped_column(ForeignKey("users_table.id"))
