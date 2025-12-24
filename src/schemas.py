@@ -33,7 +33,7 @@ class HabitOut(HabitBase):
     id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True  # Исправили (было orm_mode)
 
 
 # --- Progress DTOs ---

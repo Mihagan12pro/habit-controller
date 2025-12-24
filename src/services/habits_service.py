@@ -14,7 +14,7 @@ async def create_new_habit(
     user_result = await users_repository.get_by_id(
         user_id
     )
-    
+
     if user_result is None:
         raise HTTPException(status_code=404, detail="Пользователь не найден")
 
@@ -32,6 +32,8 @@ async def create_new_habit(
 async def get_all_habits(db: AsyncSession, user_id: int):
     habits_repository = HabitsRepository(db)
     habits = await habits_repository.get_habits(user_id)
+
+    print("\n", habits)
 
     # Проверка на пустоту (опционально, зависит от вашей check_errors)
     if not habits:
