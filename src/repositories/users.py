@@ -31,8 +31,8 @@ class UsersRepository(RepositoryBase):  # Репозиторий для юзер
     async def get_by_id(self, user_id: int) -> Union[User, str]:
         stmt = select(User).where(User.id == user_id)
         result = await self.session.execute(stmt)
-        print(result)
-        if result == None:
+        
+        if result is None:
             return "Пользователь с данным id не найден!"
         return result.scalar_one_or_none()
 
@@ -40,18 +40,20 @@ class UsersRepository(RepositoryBase):  # Репозиторий для юзер
     Создание нового пользователя
     """
 
-    async def create(self, user_dto: dto.UserCreate) -> Union[int, str]:
+    async def create(self, user_dto: dto.UserCreate) -> Union[User, str]:
         user = User()
         user.email = user_dto.email
         user.name = user_dto.name
+
         user.hashed_password = user_dto.password
 
         email_result = await self.get_by_email(user.email)
-
         if email_result is not None:
             return "Данная почта уже занята!"
 
         self.session.add(user)
         await self.session.commit()
+
         await self.session.refresh(user)
-        return user.id
+
+        return user
