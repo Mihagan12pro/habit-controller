@@ -1,4 +1,5 @@
 from datetime import date
+
 from pydantic import BaseModel
 
 
@@ -38,5 +39,4 @@ class ProgressCreate(BaseModel):
 
 
 class ProgressOut(BaseModel):
-    time_passed : str
-    
+    time_passed: str

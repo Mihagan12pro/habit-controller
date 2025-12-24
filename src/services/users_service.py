@@ -1,14 +1,15 @@
 from typing import Union
 
-from src.services.shared.httpExceptions import check_errors
-
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src import schemas
 from src.repositories.users import UsersRepository
+from src.services.shared.httpExceptions import check_errors
 
 
-async def create_user(db: AsyncSession, user_dto: schemas.UserCreate) -> Union[int, str]:
+async def create_user(
+    db: AsyncSession, user_dto: schemas.UserCreate
+) -> Union[int, str]:
     users_repo = UsersRepository(db)
     result = await users_repo.create(user_dto)
     check_errors(result, 409)

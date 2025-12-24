@@ -11,7 +11,8 @@ from src.models.base import Base
 if TYPE_CHECKING:
     from src.models.habit import Habit  # pragma: no cover
 
-#Basic class
+
+# Basic class
 class Progress(Base):
     __tablename__ = "progress_table"
 
