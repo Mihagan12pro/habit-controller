@@ -23,16 +23,15 @@ async def create_new_habit(
 
 async def get_all_habits(db: AsyncSession, user_id: int):
     habits_repository = HabitsRepository(db)
-    result = await habits_repository.get_habits(user_id)
-    check_errors(result, 404)
+    habits = await habits_repository.get_habits(user_id)
 
-    habits_out = []
+    # Проверка на пустоту (опционально, зависит от вашей check_errors)
+    if not habits:
+        # check_errors(habits, 404)
+        return []
 
-    for i in result:
-        habit_out = HabitOut(i.id, i.title, i.status)
-        habits_out.append(habit_out)
-
-    return habits_out
+    # Превращаем список объектов БД в список Pydantic-схем
+    return [HabitOut.model_validate(habit) for habit in habits]
 
 
 async def delete(db: AsyncSession, habit_id: int):
