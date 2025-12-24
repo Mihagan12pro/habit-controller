@@ -1,48 +1,33 @@
-import datetime
+from typing import Optional
 from datetime import date
-from typing import Union
-
-from sqlalchemy import select
+from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
-
-from src.models.habit import Habit
 from src.models.progress import Progress
 from src.repositories.base import RepositoryBase
-from src.schemas import ProgressOut
 
 
-class ProgressRepository(RepositoryBase):  # Репозиторий для прогресса по привычке
+class ProgressRepository(RepositoryBase):
     def __init__(self, session: AsyncSession):
         super().__init__(session)
 
-    """
-    Получить прогресс по id привычки
-    """
-
-    async def get_by_habit(self, habit: Habit) -> Union[Progress, str]:
-        stmt = select(Progress).where(Progress.habit_id == habit.id)
+    async def get_by_habit_id(self, habit_id: int) -> Optional[Progress]:
+        """
+        Получить объект прогресса по ID привычки.
+        Возвращает None, если прогресс не найден.
+        """
+        stmt = select(Progress).where(Progress.habit_id == habit_id)
         result = await self.session.execute(stmt)
 
-        if result == None:
-            return "Привычка не найдена!"
+        # Используем scalar_one_or_none - он безопасен и не роняет сервер
+        return result.scalar_one_or_none()
 
-        date_start = datetime.strptime(
-            result.scalar_one().start_date, "%Y-%m-%d"
-        ).date()
-        now = date.today()
-
-        progress_result = ProgressOut(str(now - date_start))
-
-        return progress_result
-
-    """
-    Создать новую запись прогресса
-    """
-
-    async def create(self, habit: Habit) -> int:
-
+    async def create(self, habit_id: int) -> Progress:
+        """Создать новую запись прогресса"""
         progress = Progress()
-        progress.habit_id = habit.id
+        progress.habit_id = habit_id
+
+        # ВАЖНО: Приводим дату к строке, если у вас в БД поле String
+        # Если в БД поле Date, то str() не нужен
         progress.start_date = date.today()
 
         self.session.add(progress)
@@ -50,20 +35,8 @@ class ProgressRepository(RepositoryBase):  # Репозиторий для пр�
         await self.session.refresh(progress)
         return progress
 
-    """
-    Удалить прогресс. 
-    Метод вызывается, когда статус 
-    привычки меняется на 'выработана'/'заморожена' 
-    или привычка удаляется
-    """
-
-    async def delete(self, habit: Habit):
-        habit_id = habit.id
-
-        progress_result = await self.get_by_id(habit)
-
-        if isinstance(progress_result, str):
-            return progress_result
-
-        await self.session.delete(progress_result)
+    async def delete_by_habit_id(self, habit_id: int):
+        """Удалить прогресс по id привычки"""
+        stmt = delete(Progress).where(Progress.habit_id == habit_id)
+        await self.session.execute(stmt)
         await self.session.commit()
