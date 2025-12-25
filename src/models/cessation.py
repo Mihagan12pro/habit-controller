@@ -9,11 +9,11 @@ if TYPE_CHECKING:
     from src.models.user import User  # pragma: no cover
 
 
-class AntiHabit(Base):
-    __tablename__ = "anti_habits"
+class Cessation(Base):
+    __tablename__ = "сessation"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     title: Mapped[str] = mapped_column(String, index=True)
     started_at: Mapped[datetime]
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
-    user: Mapped["User"] = relationship(back_populates="anti_habits")
+    user: Mapped["User"] = relationship(back_populates="сessation")

@@ -11,9 +11,9 @@ from fastapi import FastAPI
 
 from src.database import engine
 from src.models.base import Base
-from src.routers.anti_habits import router as anti_habits_router
-from src.routers.habits import router as habits_router
-from src.routers.users import router as users_router
+from src.routers.cessation import router as cessation_router
+from src.routers.habit import router as habit_router
+from src.routers.user import router as user_router
 
 
 # --- ИСПОЛЬЗУЕМ LIFESPAN ВМЕСТО ON_STARTUP ---
@@ -34,9 +34,9 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="Flawless App API", lifespan=lifespan)
 
 # Подключаем роутеры
-app.include_router(users_router)
-app.include_router(habits_router)
-app.include_router(anti_habits_router)
+app.include_router(user_router)
+app.include_router(habit_router)
+app.include_router(cessation_router)
 
 
 @app.get("/")

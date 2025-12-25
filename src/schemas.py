@@ -56,11 +56,11 @@ class StatsOut(BaseModel):
 
 
 # --- AntiHabit DTOs ---
-class AntiHabitCreate(BaseModel):
+class CessationCreate(BaseModel):
     pass
 
 
-class AntiHabitOut(BaseModel):
+class CessationOut(BaseModel):
     id: int
     title: str
     started_at: date

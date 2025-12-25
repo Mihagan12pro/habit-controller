@@ -7,7 +7,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from src.models.base import Base
 
 if TYPE_CHECKING:
-    from src.models.anti_habit import AntiHabit
+    from src.models.cessation import Cessation
     from src.models.habit import Habit
 
 
@@ -23,6 +23,6 @@ class User(Base):
         back_populates="user", cascade="all, delete-orphan"
     )
 
-    anti_habits: Mapped[List["AntiHabit"]] = relationship(
+    cessation: Mapped[List["Cessation"]] = relationship(
         back_populates="user", cascade="all, delete-orphan"
     )
