@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 
 class Habit(Base):
-    __tablename__ = "habits_table"
+    __tablename__ = "habits"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     title: Mapped[str] = mapped_column(
@@ -21,7 +21,7 @@ class Habit(Base):
     )
     status: Mapped[str] = mapped_column(default="start")
 
-    user_id: Mapped[int] = mapped_column(ForeignKey("users_table.id"))
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
 
     # Связи строками, чтобы избежать ошибок
     user: Mapped["User"] = relationship(back_populates="habits")

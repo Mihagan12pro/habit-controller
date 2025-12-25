@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 
 
 class User(Base):
-    __tablename__ = "users_table"
+    __tablename__ = "users"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(nullable=False)
