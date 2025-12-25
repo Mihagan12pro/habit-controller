@@ -61,4 +61,11 @@ class AntiHabitCreate(BaseModel):
 
 
 class AntiHabitOut(BaseModel):
-    pass
+    id: int
+    title: str
+    started_at: date
+    user_id: int
+    duration_seconds: int = 0  # Это поле мы вычисляем в сервисе
+
+    class Config:
+        from_attributes = True
