@@ -7,6 +7,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from src.models.base import Base  # Импортируем Base из database.py
 
 if TYPE_CHECKING:
+    from src.models.anti_habit import AntiHabit  # pragma: no cover
     from src.models.habit import Habit  # pragma: no cover
 
 
@@ -20,3 +21,4 @@ class User(Base):
 
     # Используем строку "Habit", чтобы не импортировать файл habit.py и не ломать код
     habits: Mapped[List["Habit"]] = relationship(back_populates="user")
+    anti_habits: Mapped[List["AntiHabit"]] = relationship(back_populates="user")

@@ -11,6 +11,7 @@ from fastapi import FastAPI
 
 from src.database import engine
 from src.models.base import Base
+from src.routers.anti_habits import router as anti_habits_router
 from src.routers.habits import router as habits_router
 from src.routers.users import router as users_router
 
@@ -35,6 +36,7 @@ app = FastAPI(title="Flawless App API", lifespan=lifespan)
 # Подключаем роутеры
 app.include_router(users_router)
 app.include_router(habits_router)
+app.include_router(anti_habits_router)
 
 
 @app.get("/")
