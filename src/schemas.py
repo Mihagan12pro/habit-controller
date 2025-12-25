@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import datetime, date
 
 from pydantic import BaseModel
 
@@ -55,15 +55,13 @@ class StatsOut(BaseModel):
         from_attributes = True 
 
 
-# --- AntiHabit DTOs ---
+# --- Cessation DTOs ---
 class CessationCreate(BaseModel):
-    pass
-
-
-class CessationOut(BaseModel):
-    id: int
     title: str
-    started_at: date
+
+class CessationOut(CessationCreate):
+    id: int
+    started_at: datetime
     user_id: int
     duration_seconds: int = 0  # Это поле мы вычисляем в сервисе
 

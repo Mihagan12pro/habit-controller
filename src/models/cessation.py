@@ -10,10 +10,10 @@ if TYPE_CHECKING:
 
 
 class Cessation(Base):
-    __tablename__ = "сessation"
+    __tablename__ = "cessation"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     title: Mapped[str] = mapped_column(String, index=True)
     started_at: Mapped[datetime]
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
-    user: Mapped["User"] = relationship(back_populates="сessation")
+    user: Mapped["User"] = relationship(back_populates="cessation")
