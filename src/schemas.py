@@ -43,16 +43,16 @@ class ProgressCreate(BaseModel):
 
 class ProgressOut(BaseModel):
     time_passed: str
-    
+
 class StatsOut(BaseModel):
     habit_id: int
     habit_title: str
     total_completions: int
     current_streak: int
-    dates: List[date]
+    dates: list[date]
 
     class Config:
-        from_attributes = True  # Добавили на всякий случай
+        from_attributes = True 
 
 
 # --- AntiHabit DTOs ---
