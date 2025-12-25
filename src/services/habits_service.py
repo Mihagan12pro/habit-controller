@@ -33,8 +33,6 @@ async def get_all_habits(db: AsyncSession, user_id: int):
     habits_repository = HabitsRepository(db)
     habits = await habits_repository.get_habits(user_id)
 
-    print("\n", habits)
-
     # Проверка на пустоту (опционально, зависит от вашей check_errors)
     if not habits:
         # check_errors(habits, 404)
@@ -59,48 +57,3 @@ async def change_status(db: AsyncSession, habit_id: int, status: str):
 
     return result
 
-
-# async def track_progress(db: AsyncSession, habit_id: int, day: date):
-#     progress_repo = ProgressRepository(db)
-
-#     # Проверка на дубликаты
-#     existing = await progress_repo.get_by_habit_id_and_date(habit_id, day)
-
-#     if existing:
-#         return {"message": "Already tracked or error"}
-
-#     new_record = Progress(habit_id=habit_id, start_date=day)
-#     await progress_repo.create(new_record)
-#     return {"message": "Success", "date": day}
-
-
-# async def get_user_stats(db: AsyncSession, user_id: int):
-#     habits_repo = HabitsRepository(db)
-#     progress_repo = ProgressRepository(db)
-
-#     # Получаем все привычки пользователя
-#     habits = await habits_repo.get_habits(user_id)
-
-#     stats = []
-#     for h in habits:
-#         # Получаем прогресс по привычке
-#         records = await progress_repo.get_by_habit_id(h.id)
-
-#         # Сортируем даты
-#         dates = sorted([r.start_date for r in records])
-
-#         # Простой расчет серии (streak) - заглушка логики
-#         streak = 0
-#         if dates:
-#             streak = 1  # Тут можно написать сложную логику проверки подряд идущих дней
-
-#         stats.append(
-#             {
-#                 "habit_id": h.id,
-#                 "habit_title": h.title,
-#                 "total_completions": len(dates),
-#                 "current_streak": streak,
-#                 "dates": dates,
-#             }
-#         )
-#     return stats
