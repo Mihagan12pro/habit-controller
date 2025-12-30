@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import List, Optional
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from src import schemas
@@ -20,13 +21,57 @@ async def create_cessation_service(
 
     duration = int((datetime.now() - created.started_at).total_seconds())
 
-    # Собираем DTO вручную или через model_validate, т.к. нужно поле duration
     return schemas.CessationOut(
         id=created.id,
         title=created.title,
         started_at=created.started_at,
         user_id=created.user_id,
         status=created.status,
+        duration_seconds=duration,
+    )
+
+
+async def get_all_cessations_service(
+    db: AsyncSession, user_id: int, status: Optional[str] = None
+):
+    repo = CessationsRepository(db)
+    cessations = await repo.get_by_user_id(user_id, status=status)
+
+    now = datetime.now()
+    results = []
+    for c in cessations:
+        duration = int((now - c.started_at).total_seconds())
+        results.append(
+            schemas.CessationOut(
+                id=c.id,
+                title=c.title,
+                started_at=c.started_at,
+                user_id=c.user_id,
+                status=c.status,
+                duration_seconds=duration,
+            )
+        )
+    return results
+
+
+async def update_cessation_service(
+    db: AsyncSession, cessation_id: int, updates: schemas.CessationUpdate
+):
+    repo = CessationsRepository(db)
+    updated = await repo.update(
+        cessation_id, title=updates.title, status=updates.status
+    )
+
+    if not updated:
+        raise HTTPException(status_code=404, detail="Cessation not found")
+
+    duration = int((datetime.now() - updated.started_at).total_seconds())
+    return schemas.CessationOut(
+        id=updated.id,
+        title=updated.title,
+        started_at=updated.started_at,
+        user_id=updated.user_id,
+        status=updated.status,
         duration_seconds=duration,
     )
 

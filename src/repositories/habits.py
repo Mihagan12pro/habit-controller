@@ -48,6 +48,23 @@ class HabitsRepository(RepositoryBase):
         await self.session.refresh(habit)
         return habit
 
+    async def update(
+        self, habit_id: int, title: str = None, status: str = None
+    ) -> Optional[Habit]:
+        """Обновление полей привычки"""
+        habit = await self.get_by_id(habit_id)
+        if habit is None:
+            return None
+
+        if title:
+            habit.title = title
+        if status:
+            habit.status = status
+
+        await self.session.commit()
+        await self.session.refresh(habit)
+        return habit
+
     async def delete(self, habit_id: int):
         """Мягкое удаление (смена статуса на deleted)"""
         habit = await self.get_by_id(habit_id)

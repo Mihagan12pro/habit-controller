@@ -1,4 +1,5 @@
 from datetime import datetime, date
+from typing import List, Optional
 from pydantic import BaseModel
 from enum import Enum
 
@@ -9,11 +10,13 @@ class HabitStatus(str, Enum):
     FROZEN = "frozen"  # Заморожена (отпуск/болезнь)
     ARCHIVED = "archived"  # В архиве (надоела или выполнена)
     DELETED = "deleted"  # Удалена (в корзине)
+    ACTIVE = "active"  # На всякий случай, если используется в отвыканиях
 
 
 # --- Общая схема для обновления статуса ---
 class StatusUpdate(BaseModel):
     status: HabitStatus
+
 
 # --- User DTOs ---
 class UserCreate(BaseModel):
@@ -39,6 +42,12 @@ class HabitBase(BaseModel):
 
 class HabitCreate(HabitBase):
     pass
+
+
+# Схема для редактирования (имя и/или статус)
+class HabitUpdate(BaseModel):
+    title: Optional[str] = None
+    status: Optional[HabitStatus] = None
 
 
 class HabitOut(HabitBase):
@@ -72,7 +81,13 @@ class StatsOut(BaseModel):
 # --- Cessation DTOs ---
 class CessationCreate(BaseModel):
     title: str
-    status: str = "start"
+    status: str = "start"  # Или active, смотря что в модели по дефолту
+
+
+# Схема для редактирования отвыкания
+class CessationUpdate(BaseModel):
+    title: Optional[str] = None
+    status: Optional[HabitStatus] = None
 
 
 class CessationOut(CessationCreate):
