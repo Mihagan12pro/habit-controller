@@ -9,6 +9,8 @@ from src.schemas import HabitCreate
 class HabitsRepository(RepositoryBase):
     def __init__(self, session: AsyncSession):
         super().__init__(session)
+    
+    progress_repository = None
 
     async def get_by_id(self, habit_id: int) -> Optional[Habit]:
         stmt = select(Habit).where(Habit.id == habit_id)
@@ -73,6 +75,7 @@ class HabitsRepository(RepositoryBase):
 
         habit.status = "deleted"
         await self.session.commit()
+
         return True
 
     async def change_status(self, habit_id: int, new_status: str):
@@ -84,3 +87,13 @@ class HabitsRepository(RepositoryBase):
         await self.session.commit()
         await self.session.refresh(habit)
         return habit
+    
+    async def get_status(self, habit_id: int):
+        habit = await self.get_by_id(habit_id)
+
+        if habit is None:
+            return None
+        
+        return habit.status
+        
+

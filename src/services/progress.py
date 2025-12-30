@@ -16,6 +16,9 @@ async def track_habit_progress(db: AsyncSession, habit_id: int):
     )
     if habit is None:
         raise HTTPException(status_code=404, detail="Привычка не найдена")
+    if habit.status == 'deleted':
+        raise HTTPException(status_code=400, detail="Привычка удалена")
+
 
     # 2. Ищем прогресс
     progress_repo = ProgressRepository(db)
