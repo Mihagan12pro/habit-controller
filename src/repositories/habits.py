@@ -1,21 +1,16 @@
 from typing import List, Optional
-
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-
 from src.models.habit import Habit
 from src.repositories.base import RepositoryBase
 from src.schemas import HabitCreate
 
 
-class HabitsRepository(RepositoryBase):  # Репозиторий для привычек
+class HabitsRepository(RepositoryBase):
     def __init__(self, session: AsyncSession):
         super().__init__(session)
 
-    progress_repository = None  # Обязательно надо инициализировать поле
-
     async def get_by_title(self, title: str, user_id: int) -> Optional[Habit]:
-        """Получить id привычки"""
         stmt = select(Habit).where(
             Habit.title == title,
             Habit.user_id == user_id,
@@ -24,62 +19,54 @@ class HabitsRepository(RepositoryBase):  # Репозиторий для при�
         return result.scalar_one_or_none()
 
     async def get_by_id(self, habit_id: int) -> Optional[Habit]:
-        """Получить привычку по id"""
         stmt = select(Habit).where(Habit.id == habit_id)
         result = await self.session.execute(stmt)
-
-        if result == None:
-            return "Привычка не найдена!"
-
+        # ИСПРАВЛЕНО: Возвращаем None, а не строку, чтобы сервис мог выкинуть 404
         return result.scalar_one_or_none()
 
-    async def get_habits(self, user_id: int) -> List[Habit]:
-        """Получить все привычки пользователя"""
+    async def get_habits(self, user_id: int, status: str = None) -> List[Habit]:
+        """
+        Получить привычки.
+        Если передан status (например, 'active'), фильтруем по нему.
+        """
         stmt = select(Habit).where(Habit.user_id == user_id)
+
+        if status:
+            stmt = stmt.where(Habit.status == status)
+
         result = await self.session.execute(stmt)
         return list(result.scalars().all())
 
     async def create(self, user_id: int, habit_dto: HabitCreate) -> Optional[Habit]:
-        """Создать новую привычку для пользователя"""
         if await self.get_by_title(habit_dto.title, user_id) is not None:
             return None
 
         habit = Habit()
         habit.user_id = user_id
         habit.title = habit_dto.title
-        
+        # Если в DTO есть статус, используем его, иначе дефолтный из модели
+        if hasattr(habit_dto, "status"):
+            habit.status = habit_dto.status
 
         self.session.add(habit)
         await self.session.commit()
         await self.session.refresh(habit)
-
         return habit
 
     async def delete(self, habit_id: int):
-        """Удалить привычку"""
         habit = await self.get_by_id(habit_id)
-        if habit == None:
-            return "Привычка не найдена!"
-
-        await self.progress_repository.delete(habit)
+        if habit is None:
+            return None  # Или вызывать ошибку в сервисе
 
         await self.session.delete(habit)
         await self.session.commit()
-
-    """
-    Обновление статуса привычки
-    """
+        return True
 
     async def change_status(self, habit_id: int, new_status: str):
         habit = await self.get_by_id(habit_id)
-        if habit == None:
-            return "Привычка не найдена!"
+        if habit is None:
+            return None
 
         habit.status = new_status
-
-        if new_status == habit.started:
-            await self.progress_repository.create(habit)
-        else:
-            await self.progress_repository.delete(habit)
-
         await self.session.commit()
+        return habit
