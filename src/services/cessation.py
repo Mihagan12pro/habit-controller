@@ -80,6 +80,15 @@ async def change_cessation_status_service(
     db: AsyncSession, cessation_id: int, status: str
 ):
     repo = CessationsRepository(db)
+    cessation = await repo.get_by_id(cessation_id)
+
+    if cessation is None:
+        raise HTTPException(status_code=404, detail="Cessation not found")
+    
+    if cessation.status == 'deleted':
+        raise HTTPException(status_code=400, detail="Cessation deleted")
+
+
     updated = await repo.change_status(cessation_id, status)
     if not updated:
         raise HTTPException(status_code=404, detail="Cessation not found")
