@@ -15,7 +15,7 @@ router = APIRouter(prefix="/cessations", tags=["Cessations"])
 
 
 @router.post("/{user_id}/create", response_model=schemas.CessationOut)
-async def create_cessation_endpoint(
+async def introduce_cessation(
     user_id: int,
     anti_habit: schemas.CessationCreate,
     db: AsyncSession = Depends(get_db),
@@ -25,7 +25,7 @@ async def create_cessation_endpoint(
 
 
 @router.get("/{user_id}", response_model=List[schemas.CessationOut])
-async def get_all_cessations_endpoint(
+async def show_cessations(
     user_id: int, db: AsyncSession = Depends(get_db)
 ):
     """Get all anti-habits for a user"""
@@ -33,6 +33,6 @@ async def get_all_cessations_endpoint(
 
 
 @router.post("/{id}/reset", response_model=schemas.CessationOut)
-async def reset_cessation(id: int, db: AsyncSession = Depends(get_db)):
+async def start_over_cessation(id: int, db: AsyncSession = Depends(get_db)):
     """Reset the counter for an anti-habit"""
     return await reset_cessation_counter(db, id)
