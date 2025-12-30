@@ -11,10 +11,10 @@ from src.services.cessation import (
     reset_cessation_counter,
 )
 
-router = APIRouter(prefix="/cessations", tags=["Cessations"])
+router = APIRouter(tags=["Cessations"])
 
 
-@router.post("/{user_id}/create", response_model=schemas.CessationOut)
+@router.post("/users/{user_id}/cessation", response_model=schemas.CessationOut)
 async def introduce_cessation(
     user_id: int,
     anti_habit: schemas.CessationCreate,
@@ -24,15 +24,15 @@ async def introduce_cessation(
     return await create_cessation(db, user_id, anti_habit)
 
 
-@router.get("/{user_id}", response_model=List[schemas.CessationOut])
-async def show_cessations(
-    user_id: int, db: AsyncSession = Depends(get_db)
-):
-    """Get all anti-habits for a user"""
-    return await get_all_cessations(db, user_id)
+# @router.get("/{user_id}", response_model=List[schemas.CessationOut])
+# async def show_cessations(
+#     user_id: int, db: AsyncSession = Depends(get_db)
+# ):
+#     """Get all anti-habits for a user"""
+#     return await get_all_cessations(db, user_id)
 
 
-@router.post("/{id}/reset", response_model=schemas.CessationOut)
+@router.post("/cessations/{id}/reset", response_model=schemas.CessationOut)
 async def start_over_cessation(id: int, db: AsyncSession = Depends(get_db)):
     """Reset the counter for an anti-habit"""
     return await reset_cessation_counter(db, id)
