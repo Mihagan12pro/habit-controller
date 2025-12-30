@@ -67,3 +67,12 @@ class CessationOut(CessationCreate):
 
     class Config:
         from_attributes = True
+
+# --- DASHBOARD SCHEMA (НОВОЕ) ---
+class DashboardMeta(BaseModel):
+    show_overload_warning: bool
+
+class DashboardOut(BaseModel):
+    habits: list[HabitOut]          # Список активных привычек
+    cessations: list[CessationOut]  # Список отвыканий
+    meta: DashboardMeta             # Мета-данные для подсказок
