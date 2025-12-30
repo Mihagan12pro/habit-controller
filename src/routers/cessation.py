@@ -1,38 +1,43 @@
-from typing import List
-
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-
 from src import schemas
 from src.database import get_db
 from src.services.cessation import (
-    create_cessation,
-    get_all_cessations,
+    create_cessation_service,
     reset_cessation_counter,
+    delete_cessation_service,
+    change_cessation_status_service,
 )
 
 router = APIRouter(tags=["Cessations"])
 
 
-@router.post("/users/{user_id}/cessation", response_model=schemas.CessationOut)
-async def introduce_cessation(
+# --- БЛОК 1: Создание ---
+@router.post("/users/{user_id}/cessations", response_model=schemas.CessationOut)
+async def create_cessation_endpoint(
     user_id: int,
-    anti_habit: schemas.CessationCreate,
+    cessation: schemas.CessationCreate,
     db: AsyncSession = Depends(get_db),
 ):
-    """Create a new anti-habit"""
-    return await create_cessation(db, user_id, anti_habit)
+    return await create_cessation_service(db, user_id, cessation)
 
 
-# @router.get("/{user_id}", response_model=List[schemas.CessationOut])
-# async def show_cessations(
-#     user_id: int, db: AsyncSession = Depends(get_db)
-# ):
-#     """Get all anti-habits for a user"""
-#     return await get_all_cessations(db, user_id)
-
-
+# --- БЛОК 2: Действия ---
 @router.post("/cessations/{id}/reset", response_model=schemas.CessationOut)
-async def start_over_cessation(id: int, db: AsyncSession = Depends(get_db)):
-    """Reset the counter for an anti-habit"""
+async def reset_cessation_endpoint(id: int, db: AsyncSession = Depends(get_db)):
+    """Я сорвался (сброс таймера)"""
     return await reset_cessation_counter(db, id)
+
+
+@router.patch("/cessations/{id}/status", response_model=schemas.CessationOut)
+async def update_status_endpoint(
+    id: int, status_update: schemas.StatusUpdate, db: AsyncSession = Depends(get_db)
+):
+    """Сменить статус (например, в архив)"""
+    return await change_cessation_status_service(db, id, status_update.status)
+
+
+@router.delete("/cessations/{id}")
+async def delete_cessation_endpoint(id: int, db: AsyncSession = Depends(get_db)):
+    """Мягкое удаление"""
+    return await delete_cessation_service(db, id)

@@ -1,84 +1,75 @@
 from datetime import datetime
-
 from fastapi import HTTPException
-from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
-
 from src import schemas
-from src.models.cessation import Cessation
-from src.repositories.cessations import CessationsRepository
+from src.repositories.cessations import CessationsRepository  # проверь имя файла
 from src.repositories.users import UsersRepository
 
 
-async def create_cessation(
+async def create_cessation_service(
     db: AsyncSession, user_id: int, cessation_dto: schemas.CessationCreate
 ):
-    """Create a new anti-habit with started_at set to current time"""
     users_repo = UsersRepository(db)
     cessations_repo = CessationsRepository(db)
 
-    # Проверяем, существует ли пользователь
     user = await users_repo.get_by_id(user_id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
-    new_cessation = Cessation(
-        title=cessation_dto.title, user_id=user_id, started_at=datetime.now()
+    created = await cessations_repo.create(user_id, cessation_dto)
+
+    duration = int((datetime.now() - created.started_at).total_seconds())
+
+    # Собираем DTO вручную или через model_validate, т.к. нужно поле duration
+    return schemas.CessationOut(
+        id=created.id,
+        title=created.title,
+        started_at=created.started_at,
+        user_id=created.user_id,
+        status=created.status,
+        duration_seconds=duration,
     )
 
-    try:
-        created = await cessations_repo.create(new_cessation)
-        # Calculate duration for response
-        duration_seconds = int((datetime.now() - created.started_at).total_seconds())
-        return {
-            "id": created.id,
-            "title": created.title,
-            "started_at": created.started_at,
-            "user_id": created.user_id,
-            "duration_seconds": duration_seconds,
-        }
-    except IntegrityError:
-        await db.rollback()
-        raise HTTPException(status_code=400, detail="Failed to create anti-habit")
+
+async def change_cessation_status_service(
+    db: AsyncSession, cessation_id: int, status: str
+):
+    repo = CessationsRepository(db)
+    updated = await repo.change_status(cessation_id, status)
+    if not updated:
+        raise HTTPException(status_code=404, detail="Cessation not found")
+
+    duration = int((datetime.now() - updated.started_at).total_seconds())
+    return schemas.CessationOut(
+        id=updated.id,
+        title=updated.title,
+        started_at=updated.started_at,
+        user_id=updated.user_id,
+        status=updated.status,
+        duration_seconds=duration,
+    )
 
 
-async def get_all_cessations(db: AsyncSession, user_id: int):
-    """Get all anti-habits for a user with calculated duration"""
-    cessations_repo = CessationsRepository(db)
-
-    cessations = await cessations_repo.get_by_user_id(user_id)
-
-    now = datetime.now()
-    result = []
-    for ah in cessations:
-        duration_seconds = int((now - ah.started_at).total_seconds())
-        result.append(
-            {
-                "id": ah.id,
-                "title": ah.title,
-                "started_at": ah.started_at,
-                "user_id": ah.user_id,
-                "duration_seconds": duration_seconds,
-            }
-        )
-
-    return result
+async def delete_cessation_service(db: AsyncSession, cessation_id: int):
+    repo = CessationsRepository(db)
+    # Используем мягкое удаление из репозитория
+    deleted = await repo.delete(cessation_id)
+    if not deleted:
+        raise HTTPException(status_code=404, detail="Cessation not found")
+    return {"message": "Cessation deleted"}
 
 
 async def reset_cessation_counter(db: AsyncSession, cessation_id: int):
-    """Reset the counter by updating started_at to current time"""
-    cessations_repo = CessationsRepository(db)
-
-    updated = await cessations_repo.reset_counter(cessation_id)
+    repo = CessationsRepository(db)
+    updated = await repo.reset_counter(cessation_id)
     if not updated:
         raise HTTPException(status_code=404, detail="Anti-habit not found")
 
-    # Calculate duration for response (should be 0 or very small)
-    duration_seconds = int((datetime.now() - updated.started_at).total_seconds())
-    return {
-        "id": updated.id,
-        "title": updated.title,
-        "started_at": updated.started_at,
-        "user_id": updated.user_id,
-        "duration_seconds": duration_seconds,
-    }
+    return schemas.CessationOut(
+        id=updated.id,
+        title=updated.title,
+        started_at=updated.started_at,
+        user_id=updated.user_id,
+        status=updated.status,
+        duration_seconds=0,
+    )

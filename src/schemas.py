@@ -1,7 +1,19 @@
 from datetime import datetime, date
-
 from pydantic import BaseModel
+from enum import Enum
 
+
+# 1. Создаем список возможных статусов
+class HabitStatus(str, Enum):
+    START = "start"  # Начал, в процессе
+    FROZEN = "frozen"  # Заморожена (отпуск/болезнь)
+    ARCHIVED = "archived"  # В архиве (надоела или выполнена)
+    DELETED = "deleted"  # Удалена (в корзине)
+
+
+# --- Общая схема для обновления статуса ---
+class StatusUpdate(BaseModel):
+    status: HabitStatus
 
 # --- User DTOs ---
 class UserCreate(BaseModel):
@@ -16,33 +28,35 @@ class UserOut(BaseModel):
     email: str
 
     class Config:
-        from_attributes = True  # Исправили (было orm_mode)
+        from_attributes = True
 
 
 # --- Habit DTOs ---
 class HabitBase(BaseModel):
     title: str
-    # status делаем опциональным со значением по умолчанию,
-    # чтобы не обязательно было отправлять его при создании
     status: str = "start"
+
 
 class HabitCreate(HabitBase):
     pass
 
+
 class HabitOut(HabitBase):
     id: int
+    user_id: int
 
     class Config:
-        from_attributes = True  # Исправили (было orm_mode)
+        from_attributes = True
 
 
 # --- Progress DTOs ---
 class ProgressCreate(BaseModel):
-    date: date  # YYYY-MM-DD
+    date: date
 
 
 class ProgressOut(BaseModel):
     time_passed: str
+
 
 class StatsOut(BaseModel):
     habit_id: int
@@ -52,27 +66,32 @@ class StatsOut(BaseModel):
     dates: list[date]
 
     class Config:
-        from_attributes = True 
+        from_attributes = True
 
 
 # --- Cessation DTOs ---
 class CessationCreate(BaseModel):
     title: str
+    status: str = "start"
+
 
 class CessationOut(CessationCreate):
     id: int
     started_at: datetime
     user_id: int
-    duration_seconds: int = 0  # Это поле мы вычисляем в сервисе
+    status: str
+    duration_seconds: int = 0
 
     class Config:
         from_attributes = True
 
-# --- DASHBOARD SCHEMA (НОВОЕ) ---
+
+# --- DASHBOARD SCHEMA ---
 class DashboardMeta(BaseModel):
     show_overload_warning: bool
 
+
 class DashboardOut(BaseModel):
-    habits: list[HabitOut]          # Список активных привычек
-    cessations: list[CessationOut]  # Список отвыканий
-    meta: DashboardMeta             # Мета-данные для подсказок
+    habits: list[HabitOut]
+    cessations: list[CessationOut]
+    meta: DashboardMeta

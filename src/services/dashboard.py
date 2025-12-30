@@ -17,14 +17,15 @@ async def get_dashboard_service(db: AsyncSession, user_id: int) -> schemas.Dashb
     habits_repo = HabitsRepository(db)
     cessations_repo = CessationsRepository(db)
 
-    # 1. Загрузка данных (параллельно или последовательно)
+    # 1. Загрузка данных
     all_habits = await habits_repo.get_habits(user_id)
     cessations_db = await cessations_repo.get_by_user_id(user_id)
 
     # 2. Фильтрация активных привычек
-    # Согласно твоей модели статус по умолчанию "start".
-    # Добавляем сюда "started", если статус меняется на него.
-    active_habits = [h for h in all_habits if h.status in ["start", "started"]]
+    # Статус может быть "start" (старый код) или "active" (если поменяли логику) или "started"
+    active_habits = [
+        h for h in all_habits if h.status in ["start", "started", "active"]
+    ]
 
     # 3. Обработка отвыканий (расчет времени)
     cessation_dtos = []
@@ -41,6 +42,7 @@ async def get_dashboard_service(db: AsyncSession, user_id: int) -> schemas.Dashb
             title=item.title,
             started_at=item.started_at,
             user_id=item.user_id,
+            status=item.status,  # <--- ДОБАВИЛИ ЭТУ СТРОКУ
             duration_seconds=duration,
         )
         cessation_dtos.append(dto)
