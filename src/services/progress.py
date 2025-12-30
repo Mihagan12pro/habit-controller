@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.repositories.habits import HabitsRepository
 from src.repositories.progress import ProgressRepository
-from src.schemas import ProgressOut  # Убедитесь, что импортировали схему
+from src.schemas import ProgressOut  
 
 
 async def track_habit_progress(db: AsyncSession, habit_id: int):
