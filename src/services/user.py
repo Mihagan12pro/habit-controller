@@ -4,6 +4,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src import schemas
 from src.repositories.users import UsersRepository
+from src.services.Shared.httpExceptions import check_errors
+
 
 async def create_user(
     db: AsyncSession, user_dto: schemas.UserCreate
