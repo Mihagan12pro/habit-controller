@@ -29,7 +29,7 @@ async def create_habit_endpoint(
 async def get_habits_list_endpoint(
     user_id: int,
     # Фильтр: ?status=archived. Если пусто - вернет все (кроме удаленных)
-    status: Optional[schemas.HabitStatus] = Query(None),
+    status: schemas.StatusUpdate = Query(None),
     db: AsyncSession = Depends(get_db),
 ):
     return await get_all_habits_service(db, user_id, status)

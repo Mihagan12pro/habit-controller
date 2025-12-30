@@ -1,21 +1,27 @@
-from datetime import datetime, date
-from typing import List, Optional
-from pydantic import BaseModel
+from datetime import date, datetime
 from enum import Enum
+from typing import Optional
+
+from pydantic import BaseModel
 
 
-# 1. Создаем список возможных статусов
-class HabitStatus(str, Enum):
+# эта схема нужна для понимания какие статусы есть в принципе в бд
+class Status(str, Enum):
     START = "start"  # Начал, в процессе
     FROZEN = "frozen"  # Заморожена (отпуск/болезнь)
     ARCHIVED = "archived"  # В архиве (надоела или выполнена)
     DELETED = "deleted"  # Удалена (в корзине)
-    ACTIVE = "active"  # На всякий случай, если используется в отвыканиях
+
+
+class StatusInput(str, Enum):
+    START = "start"  # Начал, в процессе
+    FROZEN = "frozen"  # Заморожена (отпуск/болезнь)
+    ARCHIVED = "archived"  # В архиве (надоела или выполнена)
 
 
 # --- Общая схема для обновления статуса ---
 class StatusUpdate(BaseModel):
-    status: HabitStatus
+    status: StatusInput
 
 
 # --- User DTOs ---
@@ -47,7 +53,7 @@ class HabitCreate(HabitBase):
 # Схема для редактирования (имя и/или статус)
 class HabitUpdate(BaseModel):
     title: Optional[str] = None
-    status: Optional[HabitStatus] = None
+    status: Optional[StatusInput] = None
 
 
 class HabitOut(HabitBase):
@@ -87,7 +93,7 @@ class CessationCreate(BaseModel):
 # Схема для редактирования отвыкания
 class CessationUpdate(BaseModel):
     title: Optional[str] = None
-    status: Optional[HabitStatus] = None
+    status: Optional[StatusInput] = None
 
 
 class CessationOut(CessationCreate):

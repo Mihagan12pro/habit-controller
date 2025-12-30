@@ -28,7 +28,7 @@ async def create_cessation_endpoint(
 @router.get("/users/{user_id}/cessations", response_model=List[schemas.CessationOut])
 async def get_cessations_list_endpoint(
     user_id: int,
-    status: Optional[schemas.HabitStatus] = Query(None),
+    status: schemas.StatusUpdate = Query(None),
     db: AsyncSession = Depends(get_db),
 ):
     return await get_all_cessations_service(db, user_id, status)
