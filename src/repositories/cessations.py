@@ -78,6 +78,14 @@ class CessationsRepository(RepositoryBase):
         await self.session.commit()
         await self.session.refresh(habit)
         return habit
+    
+    async def get_status(self, cessation_id: int):
+        cessation = await self.get_by_id(cessation_id)
+
+        if cessation is None:
+            return None
+        
+        return cessation.status
 
     async def delete(self, cessation_id: int) -> bool:
         """Мягкое удаление"""
