@@ -35,6 +35,11 @@ async def get_habit_details_service(db: AsyncSession, habit_id: int) -> HabitOut
     habit = await habits_repo.get_by_id(habit_id)
     if not habit:
         raise HTTPException(status_code=404, detail="Привычка не найдена")
+    status = await habits_repo.get_status(habit_id)
+
+    if status == 'deleted':
+        raise HTTPException(status_code=400, detail="Привычка удалена")        
+
     return HabitOut.model_validate(habit)
 
 
@@ -42,7 +47,14 @@ async def update_habit_service(
     db: AsyncSession, habit_id: int, updates: schemas.HabitUpdate
 ) -> HabitOut:
     habits_repo = HabitsRepository(db)
+    
+    habit = await habits_repo.get_by_id(habit_id)
+    if not habit:
+        raise HTTPException(status_code=404, detail="Привычка не найдена")
     # Передаем только те поля, которые установлены (не None)
+    status = await habits_repo.get_status(habit_id)
+    if status == 'deleted':
+        raise HTTPException(status_code=400, detail="Привычка удалена")  
     result = await habits_repo.update(
         habit_id, title=updates.title, status=updates.status
     )
@@ -56,6 +68,7 @@ async def delete_habit_service(db: AsyncSession, habit_id: int):
     result = await habits_repo.delete(habit_id)
     if not result:
         raise HTTPException(status_code=404, detail="Привычка не найдена")
+    
     return {"message": "Habit deleted (moved to trash)"}
 
 
