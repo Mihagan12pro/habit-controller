@@ -1,14 +1,15 @@
-from typing import List, Optional
-from fastapi import APIRouter, Depends, Query
+from typing import List
+
+from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from src import schemas
 from src.database import get_db
 from src.services.cessation import (
     create_cessation_service,
-    reset_cessation_counter,
     delete_cessation_service,
-    change_cessation_status_service,
     get_all_cessations_service,
+    reset_cessation_counter,
     update_cessation_service,
 )
 
@@ -27,11 +28,9 @@ async def create_cessation_endpoint(
 
 @router.get("/users/{user_id}/cessations", response_model=List[schemas.CessationOut])
 async def get_cessations_list_endpoint(
-    user_id: int,
-    status: schemas.StatusUpdate = Query(None),
-    db: AsyncSession = Depends(get_db),
+    user_id: int, db: AsyncSession = Depends(get_db)
 ):
-    return await get_all_cessations_service(db, user_id, status)
+    return await get_all_cessations_service(db, user_id)
 
 
 # --- БЛОК 2: Действия ---

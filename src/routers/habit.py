@@ -26,13 +26,9 @@ async def create_habit_endpoint(
 
 
 @router.get("/users/{user_id}/habits", response_model=List[schemas.HabitOut])
-async def get_habits_list_endpoint(
-    user_id: int,
-    # Фильтр: ?status=archived. Если пусто - вернет все (кроме удаленных)
-    status: schemas.StatusUpdate = Query(None),
-    db: AsyncSession = Depends(get_db),
-):
-    return await get_all_habits_service(db, user_id, status)
+async def get_habits_list_endpoint(user_id: int, db: AsyncSession = Depends(get_db)):
+    """Возвращает все привычки (кроме удаленных)"""
+    return await get_all_habits_service(db, user_id)
 
 
 # --- БЛОК 2: Действия с Привычкой ---
