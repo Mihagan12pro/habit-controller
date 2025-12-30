@@ -59,15 +59,15 @@ async def track_habit_endpoint(habit_id: int, db: AsyncSession = Depends(get_db)
     return await track_habit_progress(db, habit_id)
 
 
-# Оставил старый эндпоинт для совместимости, но PATCH /{id} выше его заменяет
-@router.patch("/habits/{habit_id}/status", response_model=schemas.HabitOut)
-async def update_status_endpoint(
-    habit_id: int,
-    status_update: schemas.StatusUpdate,
-    db: AsyncSession = Depends(get_db),
-):
-    """Сменить статус (active, archived, deleted)"""
-    return await change_habit_status_service(db, habit_id, status_update.status)
+# # Оставил старый эндпоинт для совместимости, но PATCH /{id} выше его заменяет
+# @router.patch("/habits/{habit_id}/status", response_model=schemas.HabitOut)
+# async def update_status_endpoint(
+#     habit_id: int,
+#     status_update: schemas.StatusUpdate,
+#     db: AsyncSession = Depends(get_db),
+# ):
+#     """Сменить статус (active, archived, deleted)"""
+#     return await change_habit_status_service(db, habit_id, status_update.status)
 
 
 @router.delete("/habits/{habit_id}")

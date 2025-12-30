@@ -49,12 +49,12 @@ async def reset_cessation_endpoint(id: int, db: AsyncSession = Depends(get_db)):
     return await reset_cessation_counter(db, id)
 
 
-@router.patch("/cessations/{id}/status", response_model=schemas.CessationOut)
-async def update_status_endpoint(
-    id: int, status_update: schemas.StatusUpdate, db: AsyncSession = Depends(get_db)
-):
-    """Сменить статус (например, в архив)"""
-    return await change_cessation_status_service(db, id, status_update.status)
+# @router.patch("/cessations/{id}/status", response_model=schemas.CessationOut)
+# async def update_status_endpoint(
+#     id: int, status_update: schemas.StatusUpdate, db: AsyncSession = Depends(get_db)
+# ):
+#     """Сменить статус (например, в архив)"""
+#     return await change_cessation_status_service(db, id, status_update.status)
 
 
 @router.delete("/cessations/{id}")
