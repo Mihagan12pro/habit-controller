@@ -12,13 +12,14 @@ if TYPE_CHECKING:
     from src.models.habit import Habit  # pragma: no cover
 
 
+# Basic class
 class Progress(Base):
-    __tablename__ = "progress_table"
+    __tablename__ = "progress"
 
     id: Mapped[int] = mapped_column(primary_key=True)  # Обязательно нужен PK
     # Храним календарную дату (без времени)
     start_date: Mapped[date] = mapped_column(Date, nullable=False)
 
-    habit_id: Mapped[int] = mapped_column(ForeignKey("habits_table.id"))
+    habit_id: Mapped[int] = mapped_column(ForeignKey("habits.id"))
 
     habit: Mapped["Habit"] = relationship(back_populates="progress")

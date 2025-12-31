@@ -1,54 +1,59 @@
-from sqlalchemy.future import select
-from sqlalchemy import and_
-from models import user as u
-from repositories.base import RepositoryBase
+from typing import Union
+
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+import src.schemas as dto
+from src.models.user import User
+from src.repositories.base import RepositoryBase
 
 
 class UsersRepository(RepositoryBase):  # Репозиторий для юзеров
-    def __init__(self, session):
+    def __init__(self, session: AsyncSession):
         super().__init__(session)
 
     """
-    Добавление нового юзера в бд. Используется при регистрации
+    Получить пользователя по email
     """
-    async def add_async(self, user):
-        errors = []  # Массив ошибок
-        user.email = user.email.lower()
-        result = await self.session.execute(select(u.User).filter_by(email=user.email))
-        existing_user = result.scalar_one_or_none()
 
-        if existing_user is not None:
-            errors.append("Пользователь с данной почтой уже существует!")
-            return errors
+    async def get_by_email(self, email: str) -> Union[User, str]:
+        stmt = select(User).where(User.email == email)
+        result = await self.session.execute(stmt)
+        if result == None:
+            return "Пользователь с данной почтой не найден!"
+
+        return result.scalar_one_or_none()
+
+    """
+    Получить пользователя по id
+    """
+
+    async def get_by_id(self, user_id: int) -> Union[User, str]:
+        stmt = select(User).where(User.id == user_id)
+        result = await self.session.execute(stmt)
+        
+        if result is None:
+            return "Пользователь с данным id не найден!"
+        return result.scalar_one_or_none()
+
+    """
+    Создание нового пользователя
+    """
+
+    async def create(self, user_dto: dto.UserCreate) -> Union[User, str]:
+        user = User()
+        user.email = user_dto.email
+        user.name = user_dto.name
+
+        user.hashed_password = user_dto.password
+
+        email_result = await self.get_by_email(user.email)
+        if email_result is not None:
+            return "Данная почта уже занята!"
 
         self.session.add(user)
-
         await self.session.commit()
 
-    """
-    Получение пароля пользователя по логину
-    """
-    async def get_password_async(self, id):
-        errors = []#Массив ошибок
+        await self.session.refresh(user)
 
-        user = await self.session.execute(select(u.User).filter_by(u.User.id == id))
-
-        if user == None:
-            errors.append("Неверный логин или пароль!")
-            return errors
-        
-        return user.hashed_password
-    
-    """
-    Получение логина пользователя
-    """
-    async def get_user_name_async(self, id):
-        errors = []#Массив ошибок
-
-        user = await self.session.execute(select(u.User).filter_by(u.User.id == id))
-
-        if user == None:
-            errors.append("Пользователя с данным id не существует!")
-            return errors
-        
-        return user.name
+        return user

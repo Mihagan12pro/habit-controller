@@ -1,0 +1,21 @@
+from fastapi import APIRouter, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from src import schemas
+from src.database import get_db
+from src.services.user import create_user
+from src.services.dashboard import get_dashboard_service
+
+router = APIRouter(prefix="/users", tags=["Users"])
+
+
+@router.post("/register", response_model=schemas.UserOut)
+async def register(user: schemas.UserCreate, db: AsyncSession = Depends(get_db)):
+    return await create_user(db, user)
+
+@router.get("/{user_id}/dashboard", response_model=schemas.DashboardOut)
+async def show_dashboard(user_id: int, db: AsyncSession = Depends(get_db)):
+    """
+    Получить агрегированные данные для главного экрана.
+    """
+    return await get_dashboard_service(db, user_id)

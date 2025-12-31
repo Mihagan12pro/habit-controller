@@ -1,46 +1,42 @@
+from typing import Optional
 from datetime import date
-
-from sqlalchemy.future import select
-
-from models import habit as h
-from models import progress as p
-from repositories.base import RepositoryBase
+from sqlalchemy import select, delete
+from sqlalchemy.ext.asyncio import AsyncSession
+from src.models.progress import Progress
+from src.repositories.base import RepositoryBase
 
 
-class ProgressRepository(RepositoryBase):  # Репозиторий для прогресса по привычке
-    def __init__(self, session):
+class ProgressRepository(RepositoryBase):
+    def __init__(self, session: AsyncSession):
         super().__init__(session)
 
-    """
-    Добавить статистику по привычке. Стоит вызывать в сервисе после успешного добавления новой привычки
-    """
-    async def add_async(self, habit):
-        start_date = date.today()
+    async def get_by_habit_id(self, habit_id: int) -> Optional[Progress]:
+        """
+        Получить объект прогресса по ID привычки.
+        Возвращает None, если прогресс не найден.
+        """
+        stmt = select(Progress).where(Progress.habit_id == habit_id)
+        result = await self.session.execute(stmt)
 
-        progress = p.Progress()
-        progress.habit_id = habit.habit_id
-        progress.start_date = start_date
+        # Используем scalar_one_or_none - он безопасен и не роняет сервер
+        return result.scalar_one_or_none()
+
+    async def create(self, habit_id: int) -> Progress:
+        """Создать новую запись прогресса"""
+        progress = Progress()
+        progress.habit_id = habit_id
+
+        # ВАЖНО: Приводим дату к строке, если у вас в БД поле String
+        # Если в БД поле Date, то str() не нужен
+        progress.start_date = date.today()
 
         self.session.add(progress)
         await self.session.commit()
+        await self.session.refresh(progress)
+        return progress
 
-    """
-    Получить прогресс по привычке
-    """
-    async def get_by_habit_async(self, habit):
-        progress = await self.session.execute(
-            select(h.Habit).where(h.Habit.id == habit.id)
-        )
-
-        record = progress.first()
-        if record is None:
-            return None
-
-        return record[0]
-
-    """
-    Удалить прогресс
-    """
-    async def delete_async(self, progress):
-        await self.session.delete(progress)
+    async def delete_by_habit_id(self, habit_id: int):
+        """Удалить прогресс по id привычки"""
+        stmt = delete(Progress).where(Progress.habit_id == habit_id)
+        await self.session.execute(stmt)
         await self.session.commit()
