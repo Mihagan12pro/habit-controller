@@ -58,6 +58,13 @@ async def update_cessation_service(
     db: AsyncSession, cessation_id: int, updates: schemas.CessationUpdate
 ):
     repo = CessationsRepository(db)
+    cessation = await repo.get_by_id(cessation_id)
+
+    if cessation is None:
+        raise HTTPException(status_code=404, detail="Cessation not found")
+    
+    if cessation.status == 'deleted':
+        raise HTTPException(status_code=400, detail="Cessation deleted")
     updated = await repo.update(
         cessation_id, title=updates.title, status=updates.status
     )
@@ -115,6 +122,14 @@ async def delete_cessation_service(db: AsyncSession, cessation_id: int):
 
 async def reset_cessation_counter(db: AsyncSession, cessation_id: int):
     repo = CessationsRepository(db)
+    cessation = await repo.get_by_id(cessation_id)
+
+    if cessation is None:
+        raise HTTPException(status_code=404, detail="Cessation not found")
+    
+    if cessation.status == 'deleted':
+        raise HTTPException(status_code=400, detail="Cessation deleted")
+
     updated = await repo.reset_counter(cessation_id)
     if not updated:
         raise HTTPException(status_code=404, detail="Anti-habit not found")
